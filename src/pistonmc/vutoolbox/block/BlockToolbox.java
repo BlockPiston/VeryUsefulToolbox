@@ -25,7 +25,7 @@ public class BlockToolbox extends BlockContainer {
 
 	public BlockToolbox(boolean resistance) {
 		super(Material.rock);
-        String name = resistance ? "blockToolBoxResis" : "blockToolBox";
+        String name = resistance ? "blockToolboxResis" : "blockToolbox";
 		this.setBlockName(name);
 		this.setCreativeTab(ModCreativeTab.instance);
 		this.setBlockTextureName(ModInfo.ID + ":" + name);
@@ -43,7 +43,7 @@ public class BlockToolbox extends BlockContainer {
 
 	@Override
 	public TileEntity createNewTileEntity(World world, int p_149915_2_) {
-		return new TileToolBox();
+		return new TileToolbox();
 	}
 
 	@Override
@@ -64,37 +64,19 @@ public class BlockToolbox extends BlockContainer {
 			facing = 4;
 		}
 		world.setBlockMetadataWithNotify(x, y, z, facing, 2);
-        TileToolBox te = TileToolBox.cast(world.getTileEntity(x, y, z));
-        if (te == null) {
+        TileToolbox box = TileToolbox.cast(world.getTileEntity(x, y, z));
+        if (box == null) {
             ModInfo.log.error("Cannot cast to TileToolbox!");
             return;
         }
-		TileEntity te = world.getTileEntity(x, y, z);
-		if (te instanceof TileToolBox) {
-			TileToolBox box = (TileToolBox) te;
-			if (stack.hasDisplayName()) {
-				box.setCustomInventoryName(stack.getDisplayName());
-			}
-			// if (!world.isRemote) {
-			NBTTagCompound c = stack.getTagCompound();
-			if (c != null) {
-				NBTTagCompound tag = c.getCompoundTag("recsyscletem|toolbox");
-				if (tag != null) {
-					tag.setInteger("x", x);
-					tag.setInteger("y", y);
-					tag.setInteger("z", z);
-					if (entity instanceof EntityPlayer) {
-						tag.setBoolean("hasOwner", true);
-						tag.setString("ownerName", ((EntityPlayer) entity).getDisplayName());
-						tag.setString("ownerUUID", entity.getUniqueID().toString());
-					} else {
-						tag.setBoolean("hasOwner", false);
-					}
-					box.readFromNBT(tag);
-				}
-			}
-			// }
-		}
+        if (stack.hasDisplayName()) {
+            box.setCustomInventoryName(stack.getDisplayName());
+        }
+        NBTTagToolbox tag = NBTTagToolbox.fromItemStack(stack);
+        if (tag != null) {
+            tag.setOwner(entity);
+            box.readFromNBT(tag);
+        }
 		if (world.isRemote && OtherConfig.displayInfoWhenPlacingToolBox) {
 			PistonToolbox.printChatMessage(
 					StatCollector.translateToLocalFormatted("message.tntptool.toolbox_place", x, y, z));
@@ -103,7 +85,7 @@ public class BlockToolbox extends BlockContainer {
 
 	@Override
 	public void breakBlock(World world, int x, int y, int z, Block block, int meta) {
-		TileToolBox tile = (TileToolBox) world.getTileEntity(x, y, z);
+		TileToolbox tile = (TileToolbox) world.getTileEntity(x, y, z);
 
 		if (tile != null) {
 
@@ -147,7 +129,7 @@ public class BlockToolbox extends BlockContainer {
 		if (world.isRemote) {
 			return true;
 		} else {
-			TileToolBox inventory = (TileToolBox) world.getTileEntity(x, y, z);
+			TileToolbox inventory = (TileToolbox) world.getTileEntity(x, y, z);
 
 			if (inventory != null) {
 				if (inventory.hasSecurityUpgrade()) {
@@ -241,7 +223,7 @@ public class BlockToolbox extends BlockContainer {
 	public void onBlockClicked(World world, int x, int y, int z, EntityPlayer player) {
 		if (!world.isRemote) {
 			if (player.isSneaking()) {
-				TileToolBox inventory = (TileToolBox) world.getTileEntity(x, y, z);
+				TileToolbox inventory = (TileToolbox) world.getTileEntity(x, y, z);
 
 				if (inventory != null) {
 					if (inventory.hasSecurityUpgrade()) {

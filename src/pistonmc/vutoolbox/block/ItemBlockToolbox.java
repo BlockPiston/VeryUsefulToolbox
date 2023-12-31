@@ -57,7 +57,7 @@ public class ItemBlockTooltip extends ItemBlock {
 						}
 						if (pickupUpgrade) {
 							tooltip.add(StatCollector.translateToLocal("tooltip.tntptool.toolbox.pickup"));
-							int infLimit = (int) (TileToolBox.cfgStorageLimit * Math.pow(2, inf));
+							int infLimit = (int) (TileToolbox.cfgStorageLimit * Math.pow(2, inf));
 							for (int i = 0; i < 2; i++) {
 								NBTTagCompound infTag = tag.getCompoundTag("inf" + i);
 								int infc = infTag.getInteger("infCount");

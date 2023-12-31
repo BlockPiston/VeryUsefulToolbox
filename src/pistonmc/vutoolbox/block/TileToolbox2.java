@@ -15,14 +15,14 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.common.config.ConfigCategory;
 import net.minecraftforge.common.config.Property;
 
-public class TileToolBox extends TileAbstract {
+public class TileToolbox extends TileAbstract {
 
     /**
      * Casts a TileEntity to a TileToolBox, return null if fail
      */
-    public static TileToolBox cast(TileEntity tile) {
-        if (tile instanceof TileToolBox) {
-            return (TileToolBox) tile;
+    public static TileToolbox cast(TileEntity tile) {
+        if (tile instanceof TileToolbox) {
+            return (TileToolbox) tile;
         }
         return null;
     }
@@ -60,7 +60,7 @@ public class TileToolBox extends TileAbstract {
 	private String customName;
 	private boolean invModified;
 
-	public TileToolBox() {
+	public TileToolbox() {
 		super(61);
 		infiniteStacks = new ItemStack[2];
 		infiniteCount = new int[2];
