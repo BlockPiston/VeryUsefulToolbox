@@ -1,0 +1,63 @@
+#Recsyscletem 2
+itemGroup.vutoolbox.creativetab=Piston's Toolbox
+
+tile.blockToolbox.name=Tool Box
+tile.blockToolboxResis.name=Reinforced Tool Box
+tile.blockToolboxWithUser.name=%s's Tool Box
+
+item.itemChipset.name=Chipset
+item.itemChipsetSeal.name=Chipset Seal
+item.itemChipsetCoreCraft.name=Crafting Core
+item.itemChipsetUpgradeCraft.name=Crafting Upgrade
+item.itemChipsetCoreStorage.name=Storage Core
+item.itemChipsetUpgradeStorage.name=Storage Upgrade
+item.itemChipsetCoreResis.name=Resistance Core
+item.itemChipsetUpgradeResis.name=Resistance Upgrade
+item.itemChipsetCoreSecurity.name=Security Core
+item.itemChipsetUpgradeSecurity.name=Security Upgrade
+item.itemChipsetCoreInfinity.name=Infinity Core
+item.itemChipsetUpgradeInfinity.name=Infinity Upgrade
+item.itemChipsetCorePickup.name=Pick-up Core
+item.itemChipsetUpgradePickup.name=Pick-up Upgrade
+
+tooltip.vutoolbox.shift=<Sneak for more info>
+tooltip.vutoolbox.toolbox.content=Contains Tools
+tooltip.vutoolbox.toolbox.craft=§6Crafting Upgrade§r
+tooltip.vutoolbox.toolbox.storage=§bStorage Upgrade§r
+tooltip.vutoolbox.toolbox.exploresis=§5Resistance Upgrade§r
+tooltip.vutoolbox.toolbox.security=§aSecurity Upgrade§r
+tooltip.vutoolbox.toolbox.inf=§cInfinity Upgrade x%d§r
+tooltip.vutoolbox.toolbox.pickup=§ePick-up Upgrade§r
+tooltip.vutoolbox.toolbox.inf_storage=%d/%d
+
+tooltip.vutoolbox.resistance_upgrade=Effective after re-placing the block
+tooltip.vutoolbox.storage_upgrade=Effective after re-opening the GUI
+
+message.vutoolbox.toolbox_security=This Toolbox is locked by %s
+
+message.vutoolbox.toolbox_place=Toolbox placed at %d, %d, %d
+
+vutoolbox.gui.toolbox.line0=§o§fInstructions - How to use?§r
+vutoolbox.gui.toolbox.line1=§7-Top 9 slots can only fit non-stackable items§r
+vutoolbox.gui.toolbox.line2=§7-Left 15 & middle 9 slots can fit any item, but§r
+vutoolbox.gui.toolbox.line3=§7   max stack size is 1§r
+vutoolbox.gui.toolbox.line4=§7-Right 9 slots are the same as the middle 9,§r
+vutoolbox.gui.toolbox.line5=§7   However they can be upgraded with Storage§r
+vutoolbox.gui.toolbox.line6=§7   Upgrade to have a max stack size of 64§r
+vutoolbox.gui.toolbox.line7=§7-Bottom 9 slots have a max stack size of 64§r
+vutoolbox.gui.toolbox.line8=§7   They also support automation§r
+vutoolbox.gui.toolbox.line9=§7-Bottom-right 6 slots are for upgrades§r
+vutoolbox.gui.toolbox.line10=§7-Above the upgrades slots are two spaces for§r
+vutoolbox.gui.toolbox.line11=§7   storing a large quantity of the same item§r
+vutoolbox.gui.toolbox.line12=§7   even when they are not stackable§r
+vutoolbox.gui.toolbox.line13=§7-Toolboxes doesn't fit in any of these slots§r
+vutoolbox.gui.toolbox.line14=§7-Right-clicking the top side allows quick §r
+vutoolbox.gui.toolbox.line15=§7   access to the top 9 slots §r
+vutoolbox.gui.toolbox.line16=§7-Sneak and right-click any other side to break§r
+vutoolbox.gui.toolbox.line17=§7-Sneak and left-click any side to put the stack§r
+vutoolbox.gui.toolbox.line18=§7   in your hand into the box§r
+vutoolbox.gui.toolbox.line19=§7-When the block is broken, it keeps all the items§r
+vutoolbox.gui.toolbox.line20=
+vutoolbox.gui.toolbox.amount=Amount: %d/%d
+vutoolbox.gui.toolbox.craft=Crafting
+
