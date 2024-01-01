@@ -8,6 +8,7 @@ import net.minecraft.inventory.Slot;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import pistonmc.vutoolbox.block.TileToolbox;
+import pistonmc.vutoolbox.core.Toolbox;
 
 public class ContainerToolbox extends Container {
 	private TileToolbox tile;
@@ -19,7 +20,7 @@ public class ContainerToolbox extends Container {
 
 	public ContainerToolbox(TileToolbox tile, IInventory playerInventory) {
 		super(tile, playerInventory, 11, 132);
-		machine = machineInv;
+		this.tile = tile;
 		setupMachineSlots();
 		machineSlots = machine.getSizeInventory();
 		machine.openInventory();
@@ -39,20 +40,22 @@ public class ContainerToolbox extends Container {
 	@Override
 	public void setupMachineSlots() {
 		int i = 0;
-		for (int j = 0; j < 9; j++) {
+		// top slots can only put unstackable items
+		for (int j = 0; j < Toolbox.NUM_TOP_SLOTS; j++) {
+			SlotToolbox slot =
 			this.addSlotToContainer(new SlotToolBoxUnstackable(machine, i, 33 + j * 18, 21));
 			//setonlyallowunstackable
 			i++;
 		}
 		for (int k = 0; k < 3; k++) {
 			for (int j = 0; j < 5; j++) {
-				this.addSlotToContainer(new SlotToolBox(machine, i, 11 + j * 18, 42 + k * 18));
+				this.addSlotToContainer(new SlotToolbox2(machine, i, 11 + j * 18, 42 + k * 18));
 				i++;
 			}
 		}
 		for (int k = 0; k < 3; k++) {
 			for (int j = 0; j < 3; j++) {
-				this.addSlotToContainer(new SlotToolBox(machine, i, 103 + j * 18, 42 + k * 18));
+				this.addSlotToContainer(new SlotToolbox2(machine, i, 103 + j * 18, 42 + k * 18));
 				i++;
 			}
 		}
@@ -64,7 +67,7 @@ public class ContainerToolbox extends Container {
 				}
 					
 				else {
-					this.addSlotToContainer(new SlotToolBox(machine, i, 159 + j * 18, 42 + k * 18));
+					this.addSlotToContainer(new SlotToolbox2(machine, i, 159 + j * 18, 42 + k * 18));
 				}
 					
 				i++;
@@ -78,7 +81,7 @@ public class ContainerToolbox extends Container {
 	
 		for (int k = 0; k < 3; k++) {
 			for (int j = 0; j < 2; j++) {
-				this.addSlotToContainer(new SlotToolBox(machine, i, 177 + j * 18, 154 + k * 18));
+				this.addSlotToContainer(new SlotToolbox2(machine, i, 177 + j * 18, 154 + k * 18));
 				i++;
 			}
 		}

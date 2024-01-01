@@ -13,11 +13,11 @@ import pistonmc.vutoolbox.low.NBTToolbox;
  */
 public class Toolbox {
 	public static final int NUM_TOP_SLOTS = 9;
-	private static final int NUM_MIDDLE_LEFT_SLOTS = 15;
-	private static final int NUM_MIDDLE_SLOTS = 9;
-	private static final int NUM_MIDDLE_RIGHT_SLOTS = 9;
-	private static final int NUM_BOTTOM_SLOTS = 9;
-	private static final int NUM_UPGRADE_SLOTS = 6;
+	public static final int NUM_MIDDLE_LEFT_SLOTS = 15;
+	public static final int NUM_MIDDLE_SLOTS = 9;
+	public static final int NUM_MIDDLE_RIGHT_SLOTS = 9;
+	public static final int NUM_BOTTOM_SLOTS = 9;
+	public static final int NUM_UPGRADE_SLOTS = 6;
 	
 	public static final int NUM_INFINITY_SLOTS = 2;
 	// @formatter:off

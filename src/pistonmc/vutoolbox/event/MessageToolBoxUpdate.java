@@ -11,7 +11,6 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 import pistonmc.vutoolbox.ModUtils;
-import pistonmc.vutoolbox.PistonToolbox;
 import pistonmc.vutoolbox.block.TileToolbox;
 import pistonmc.vutoolbox.core.Toolbox;
 

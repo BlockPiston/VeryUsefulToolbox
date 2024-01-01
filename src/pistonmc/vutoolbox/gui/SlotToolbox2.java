@@ -6,12 +6,12 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import pistonmc.vutoolbox.ModObjects;
 
-public class SlotToolBox extends Slot {
+public class SlotToolbox2 extends Slot {
 	
 	private boolean onlyAllowUnstackable;
 	private boolean isSingleItemSlot;
 
-	public SlotToolBox(IInventory inventory, int index, int x, int y) {
+	public SlotToolbox2(IInventory inventory, int index, int x, int y) {
 		super(inventory, index, x, y);
 		isSingleItemSlot = true;
 	}
