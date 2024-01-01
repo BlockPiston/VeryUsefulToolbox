@@ -4,18 +4,21 @@ import java.util.UUID;
 
 import com.tntp.tntptool.RS2Blocks;
 import com.tntp.tntptool.RS2Items;
-import com.tntp.tntptool.RecsyscletemItemStacks;
-import com.tntp.tntptool.network.MessageToolBoxUpdate;
-import com.tntp.tntptool.network.RS2Network;
 
 import cpw.mods.fml.common.network.NetworkRegistry.TargetPoint;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraftforge.common.config.ConfigCategory;
-import net.minecraftforge.common.config.Property;
+import net.minecraft.tileentity.TileEntity;
+import pistonmc.vutoolbox.ModInfo;
+import pistonmc.vutoolbox.ModUtils;
+import pistonmc.vutoolbox.core.Toolbox;
+import pistonmc.vutoolbox.event.MessageToolBoxUpdate;
+import pistonmc.vutoolbox.event.RS2Network;
+import pistonmc.vutoolbox.low.NBTToolbox;
 
-public class TileToolbox extends TileAbstract {
+public class TileToolbox extends TileEntity implements ISidedInventory {
 
     /**
      * Casts a TileEntity to a TileToolBox, return null if fail
@@ -24,10 +27,9 @@ public class TileToolbox extends TileAbstract {
         if (tile instanceof TileToolbox) {
             return (TileToolbox) tile;
         }
+        ModInfo.log.error("Cannot cast to TileToolbox!");
         return null;
     }
-
-	public static int cfgStorageLimit = 1024;
 
 //  public static void loadConfig(RS2Config c, State s) {
 //    if (s == State.PRE_INIT) {
@@ -42,23 +44,14 @@ public class TileToolbox extends TileAbstract {
 	private static final int[] AUTO_SLOTS = { 42, 43, 44, 45, 46, 47, 48, 49, 50 };
 	private static final int[] INF_IN = { 57, 58 };
 	private static final int[] INF_OUT = { 59, 60 };
-	private boolean craftUpgrade;
-	private boolean explosionUpgrade;
-	private boolean storageUpgrade;
-	private boolean securityUpgrade;
-	private boolean pickupUpgrade;
-	private int infiniteUpgrade;
-	private String ownerName;
-	private UUID ownerUUID;
 
-	private ItemStack[] infiniteStacks;
-	private int[] infiniteCount;
 	// for client caching
 	private int[] infiniteMetadata;
 
 	private int workCount;
-	private String customName;
 	private boolean invModified;
+	
+	private Toolbox toolbox;
 
 	public TileToolbox() {
 		super(61);
@@ -66,15 +59,108 @@ public class TileToolbox extends TileAbstract {
 		infiniteCount = new int[2];
 		infiniteMetadata = new int[2];
 		invModified = true;
+		
+		toolbox = new Toolbox();
+	}
+	
+	@Override
+	public int getSizeInventory() {
+		return Toolbox.NUM_TOTAL_SLOTS;
+	}
+	
+	@Override
+	public ItemStack getStackInSlot(int slot) {
+		return toolbox.getStackInSlot(slot);
+	}
+	
+	@Override
+	public ItemStack decrStackSize(int slot, int requestCount) {
+		ItemStack stack = toolbox.decrStackSize(slot, requestCount);
+		if (stack != null) {
+			markDirty();
+		}
+		return stack;
+	}
+	
+	@Override
+	public ItemStack getStackInSlotOnClosing(int slot) {
+		// don't know if this implementation is necessary
+		// since we don't drop items on close
+		// just for safety
+		return toolbox.takeStack(slot);
+	}
+	
+	@Override
+	public void setInventorySlotContents(int slot, ItemStack stack) {
+		toolbox.setSlot(slot, stack);
+		this.markDirty();
 	}
 
 	public void setInventoryModified() {
 		invModified = true;
 	}
+	
+	@Override
+	public String getInventoryName() {
+		String customName = toolbox.getCustomName();
+		if (customName == null) {
+			return "tile."+BlockToolbox.NAME+".name";
+		}
+		return customName;
+	}
 
 	@Override
 	public boolean hasCustomInventoryName() {
-		return customName != null && customName.length() > 0;
+		return toolbox.getCustomName() != null;
+	}
+	
+	@Override
+	public int getInventoryStackLimit() {
+		return 64;
+	}
+	
+	@Override
+	public boolean isUseableByPlayer(EntityPlayer player) {
+		TileEntity t = this.worldObj.getTileEntity(this.xCoord, this.yCoord, this.zCoord);
+		if (t != this) {
+			return false;
+		}
+		if (!ModUtils.isTileEntityUsableByPlayerByDistance(this, player)) {
+			return false;
+		}
+		return toolbox.canUse(player.getUniqueID());
+	}
+	
+	@Override
+	public void openInventory() {
+	}
+
+	@Override
+	public void closeInventory() {
+	}
+	
+	@Override
+	public int[] getAccessibleSlotsFromSide(int side) {
+		return Toolbox.AUTOMATION_SLOTS;
+	}
+
+	@Override
+	public boolean isItemValidForSlot(int slot, ItemStack stack) {
+		return Toolbox.isAutomationSlot(slot);
+	}
+
+	@Override
+	public boolean canInsertItem(int slot, ItemStack item, int side) {
+		return Toolbox.isAutomationSlot(slot);
+	}
+
+	@Override
+	public boolean canExtractItem(int slot, ItemStack item, int side) {
+		return Toolbox.isAutomationSlot(slot);
+	}
+	
+	public Toolbox getToolbox() {
+		return toolbox;
 	}
 
 	@Override
@@ -200,90 +286,9 @@ public class TileToolbox extends TileAbstract {
 		infiniteUpgrade = Math.min(3, infinite);
 	}
 
-	@Override
-	public String getInventoryName() {
-		return hasCustomInventoryName() ? customName : "tile.blockToolBox.name";
-	}
+	
 
-	public void setCustomInventoryName(String name) {
-		customName = name;
-	}
-
-	@Override
-	public void writeToNBT(NBTTagCompound tag) {
-		super.writeToNBT(tag);
-		for (int i = 0; i < infiniteStacks.length; i++) {
-			NBTTagCompound inf = new NBTTagCompound();
-			ItemStack s = infiniteStacks[i];
-			if (s == null) {
-				RecsyscletemItemStacks.writeNullStackToNBT(inf);
-			} else {
-				s.writeToNBT(inf);
-			}
-			inf.setInteger("infCount", infiniteCount[i]);
-			tag.setTag("inf" + i, inf);
-		}
-		tag.setBoolean("craft", craftUpgrade);
-		tag.setBoolean("resis", explosionUpgrade);
-		tag.setBoolean("stora", storageUpgrade);
-		tag.setBoolean("secur", securityUpgrade);
-		tag.setBoolean("picku", pickupUpgrade);
-		tag.setInteger("infStorageUpgrade", infiniteUpgrade);
-		tag.setBoolean("hasOwner", ownerName != null);
-		if (ownerName != null) {
-			tag.setString("ownerName", ownerName);
-			tag.setString("ownerUUID", ownerUUID.toString());
-		}
-	}
-
-	@Override
-	public void readFromNBT(NBTTagCompound tag) {
-		super.readFromNBT(tag);
-		for (int i = 0; i < infiniteStacks.length; i++) {
-			NBTTagCompound inf = tag.getCompoundTag("inf" + i);
-			infiniteStacks[i] = ItemStack.loadItemStackFromNBT(inf);
-			infiniteCount[i] = inf.getInteger("infCount");
-		}
-		craftUpgrade = tag.getBoolean("craft");
-		explosionUpgrade = tag.getBoolean("resis");
-		storageUpgrade = tag.getBoolean("stora");
-		securityUpgrade = tag.getBoolean("secur");
-		infiniteUpgrade = tag.getInteger("infStorageUpgrade");
-		pickupUpgrade = tag.getBoolean("picku");
-		ownerName = null;
-		if (tag.getBoolean("hasOwner")) {
-			ownerName = tag.getString("ownerName");
-			ownerUUID = UUID.fromString(tag.getString("ownerUUID"));
-		}
-	}
-
-	@Override
-	public int[] getAccessibleSlotsFromSide(int p_94128_1_) {
-		return AUTO_SLOTS;
-	}
-
-	@Override
-	public boolean isItemValidForSlot(int p_94041_1_, ItemStack stack) {
-		return true;
-	}
-
-	@Override
-	public boolean canInsertItem(int slot, ItemStack item, int side) {
-		return slot >= 42 && slot <= 50;
-	}
-
-	@Override
-	public boolean canExtractItem(int slot, ItemStack item, int side) {
-		return slot >= 42 && slot <= 50;
-	}
-
-	public ItemStack getInfStorage(int i) {
-		return infiniteStacks[i];
-	}
-
-	public int getInfCount(int i) {
-		return infiniteCount[i];
-	}
+	
 
 	public void setInfStorageCount(int i, int count) {
 		infiniteCount[i] = count;
@@ -347,45 +352,25 @@ public class TileToolbox extends TileAbstract {
 
 	}
 
-	public boolean hasCraftUpgrade() {
-		return craftUpgrade;
-	}
 
-	public boolean hasResistanceUpgrade() {
-		return explosionUpgrade;
+	@Override
+	public void writeToNBT(NBTTagCompound tag) {
+		super.writeToNBT(tag);
+		writeToolboxToNBT(new NBTToolbox(tag));
 	}
-
-	public boolean hasStorageUpgrade() {
-		return storageUpgrade;
-	}
-
-	public boolean hasSecurityUpgrade() {
-		return securityUpgrade;
-	}
-
-	public boolean hasPickupUpgrade() {
-		return pickupUpgrade;
-	}
-
-	public String getOwner() {
-		return ownerName;
-	}
-
-	public boolean isOwner(UUID uuid) {
-		return ownerName == null ? true : ownerUUID.equals(uuid);
+	
+	public void writeToolboxToNBT(NBTToolbox tag) {
+		toolbox.writeToNBT(tag);
 	}
 
 	@Override
-	public boolean isUseableByPlayer(EntityPlayer player) {
-		if (!super.isUseableByPlayer(player)) {
-			return false;
-		}
-		if (hasSecurityUpgrade()) {
-			if (!isOwner(player.getUniqueID())) {
-				return false;
-			}
-		}
-		return true;
+	public void readFromNBT(NBTTagCompound tag) {
+		super.readFromNBT(tag);
+		readToolboxFromNBT(new NBTToolbox(tag));
+	}
+	
+	public void readToolboxFromNBT(NBTToolbox tag) {
+		toolbox.readFromNBT(tag);
 	}
 
 }

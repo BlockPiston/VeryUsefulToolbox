@@ -18,14 +18,26 @@ import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
 import pistonmc.vutoolbox.ModCreativeTab;
 import pistonmc.vutoolbox.ModInfo;
+import pistonmc.vutoolbox.ModObjects;
+import pistonmc.vutoolbox.ModUtils;
+import pistonmc.vutoolbox.OtherConfig;
+import pistonmc.vutoolbox.PistonToolbox;
+import pistonmc.vutoolbox.core.Toolbox;
+import pistonmc.vutoolbox.event.MessageToolBoxSecurity;
+import pistonmc.vutoolbox.event.RS2Network;
+import pistonmc.vutoolbox.gui.ContainerToolBox2;
+import pistonmc.vutoolbox.gui.GuiToolBox;
+import pistonmc.vutoolbox.gui.SlotToolBoxUnstackable;
+import pistonmc.vutoolbox.low.NBTToolbox;
 
 public class BlockToolbox extends BlockContainer {
+	public static final String NAME = "blockToolbox";
 	public int modelRenderID = 0;
 	public static final boolean infoOnPlaced = false;
 
 	public BlockToolbox(boolean resistance) {
 		super(Material.rock);
-        String name = resistance ? "blockToolboxResis" : "blockToolbox";
+        String name = resistance ? (NAME + "Resis") : NAME;
 		this.setBlockName(name);
 		this.setCreativeTab(ModCreativeTab.instance);
 		this.setBlockTextureName(ModInfo.ID + ":" + name);
@@ -46,6 +58,9 @@ public class BlockToolbox extends BlockContainer {
 		return new TileToolbox();
 	}
 
+	/**
+	 * Transfer the data from item to tile on place
+	 */
 	@Override
 	public void onBlockPlacedBy(World world, int x, int y, int z, EntityLivingBase entity, ItemStack stack) {
 
@@ -55,71 +70,67 @@ public class BlockToolbox extends BlockContainer {
 		if (l == 1) {
 			facing = 5;
 		}
-
 		if (l == 2) {
 			facing = 3;
 		}
-
 		if (l == 3) {
 			facing = 4;
 		}
 		world.setBlockMetadataWithNotify(x, y, z, facing, 2);
-        TileToolbox box = TileToolbox.cast(world.getTileEntity(x, y, z));
-        if (box == null) {
-            ModInfo.log.error("Cannot cast to TileToolbox!");
+        TileToolbox tile = TileToolbox.cast(world.getTileEntity(x, y, z));
+        if (tile == null) {
             return;
         }
-        if (stack.hasDisplayName()) {
-            box.setCustomInventoryName(stack.getDisplayName());
-        }
-        NBTTagToolbox tag = NBTTagToolbox.fromItemStack(stack);
+        Toolbox toolbox = tile.getToolbox();
+
+        NBTToolbox tag = NBTToolbox.fromItemStack(stack);
         if (tag != null) {
-            tag.setOwner(entity);
-            box.readFromNBT(tag);
+            tile.readToolboxFromNBT(tag);
+            toolbox.setOwner(entity);
+        }
+        if (stack.hasDisplayName()) {
+        	toolbox.setCustomName(stack.getDisplayName());
         }
 		if (world.isRemote && OtherConfig.displayInfoWhenPlacingToolBox) {
-			PistonToolbox.printChatMessage(
-					StatCollector.translateToLocalFormatted("message.tntptool.toolbox_place", x, y, z));
+			ModUtils.printChatMessage(
+					StatCollector.translateToLocalFormatted("message."+ModInfo.ID+".toolbox_place", x, y, z));
 		}
 	}
 
+	/**
+	 * Transfer the data from tile to item on break
+	 */
 	@Override
 	public void breakBlock(World world, int x, int y, int z, Block block, int meta) {
-		TileToolbox tile = (TileToolbox) world.getTileEntity(x, y, z);
-
+		TileToolbox tile = TileToolbox.cast(world.getTileEntity(x, y, z));
 		if (tile != null) {
-
-			float f = PistonToolbox.UNIMPORTANT.nextFloat() * 0.8F + 0.1F;
-			float f1 = PistonToolbox.UNIMPORTANT.nextFloat() * 0.8F + 0.1F;
-			float f2 = PistonToolbox.UNIMPORTANT.nextFloat() * 0.8F + 0.1F;
-			Block blockType = tile.hasResistanceUpgrade() ? RS2Blocks.blockToolBoxResis : RS2Blocks.blockToolBox;
-
-			NBTTagCompound tag = new NBTTagCompound();
-			NBTTagCompound nbt = new NBTTagCompound();
-			tile.writeToNBT(nbt);
-			nbt.setInteger("x", 0);
-			nbt.setInteger("y", 0);
-			nbt.setInteger("z", 0);
-			String owner = tile.getOwner();
-
-			tag.setTag("recsyscletem|toolbox", nbt);
-
-			EntityItem entityitem = new EntityItem(world, x + f, y + f1, z + f2, new ItemStack(blockType, 1, 0));
-			entityitem.getEntityItem().setTagCompound(tag);
-			if (owner != null) {
-				if (!tile.hasCustomInventoryName())
+			Block blockType = tile.hasResistanceUpgrade() ? ModObjects.blockToolBoxResis : ModObjects.blockToolBox;
+			NBTToolbox tagToolbox = new NBTToolbox(new NBTTagCompound());
+			tile.writeToolboxToNBT(tagToolbox);
+			float dx = ModUtils.RNG.nextFloat() * 0.8F + 0.1F;
+			float dy = ModUtils.RNG.nextFloat() * 0.8F + 0.1F;
+			float dz = ModUtils.RNG.nextFloat() * 0.8F + 0.1F;
+			EntityItem entityitem = new EntityItem(world, x + dx, y + dy, z + dz, new ItemStack(blockType, 1, 0));
+			tagToolbox.setToItemStack(entityitem.getEntityItem());
+			
+			if (tile.hasCustomInventoryName()) {
+				entityitem.getEntityItem().setStackDisplayName(tile.getInventoryName());
+			} else {
+				String ownerName = tile.getToolbox().getOwner();
+				if (ownerName == null || ownerName.isEmpty()) {
 					entityitem.getEntityItem().setStackDisplayName(
-							StatCollector.translateToLocalFormatted("tile.blockToolBoxWithUser.name", owner));
-				else
-					entityitem.getEntityItem().setStackDisplayName(tile.getInventoryName());
+							StatCollector.translateToLocalFormatted("tile."+NAME+"WithUser.name", ownerName));
+				}
 			}
+			
 			float f3 = 0.05F;
-			entityitem.motionX = (float) PistonToolbox.UNIMPORTANT.nextGaussian() * f3;
-			entityitem.motionY = (float) PistonToolbox.UNIMPORTANT.nextGaussian() * f3 + 0.2F;
-			entityitem.motionZ = (float) PistonToolbox.UNIMPORTANT.nextGaussian() * f3;
+			entityitem.motionX = (float) ModUtils.RNG.nextGaussian() * f3;
+			entityitem.motionY = (float) ModUtils.RNG.nextGaussian() * f3 + 0.2F;
+			entityitem.motionZ = (float) ModUtils.RNG.nextGaussian() * f3;
 			world.spawnEntityInWorld(entityitem);
 			world.func_147453_f(x, y, z, block);
 		}
+	
 		super.breakBlock(world, x, y, z, block, meta);
 	}
 
@@ -219,7 +230,6 @@ public class BlockToolbox extends BlockContainer {
 	}
 
 	@Override
-	@Deprecated
 	public void onBlockClicked(World world, int x, int y, int z, EntityPlayer player) {
 		if (!world.isRemote) {
 			if (player.isSneaking()) {
@@ -233,7 +243,7 @@ public class BlockToolbox extends BlockContainer {
 							return;
 						}
 					}
-					ContainerToolBox container = new ContainerToolBox(inventory, player.inventory);
+					ContainerToolBox2 container = new ContainerToolBox2(inventory, player.inventory);
 					container.transferStackInSlot(player, player.inventory.currentItem + 88);
 					player.inventory.markDirty();
 					inventory.markDirty();

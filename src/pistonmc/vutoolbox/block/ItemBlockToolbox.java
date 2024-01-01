@@ -1,10 +1,6 @@
-package com.tntp.tntptool.item;
+package pistonmc.vutoolbox.block;
 
 import java.util.List;
-
-import com.tntp.tntptool.PistonToolbox;
-import com.tntp.tntptool.RS2Blocks;
-import com.tntp.tntptool.tileentity.TileToolBox;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -15,69 +11,41 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.StatCollector;
+import pistonmc.vutoolbox.ModInfo;
+import pistonmc.vutoolbox.ModObjects;
+import pistonmc.vutoolbox.ModUtils;
+import pistonmc.vutoolbox.core.ToolboxStatus;
+import pistonmc.vutoolbox.core.ToolboxTooltip;
+import pistonmc.vutoolbox.low.NBTToolbox;
 
-public class ItemBlockTooltip extends ItemBlock {
+public class ItemBlockToolbox extends ItemBlock {
 
-	public ItemBlockTooltip(Block block) {
+	public ItemBlockToolbox(Block block) {
 		super(block);
 	}
 
 	@Override
 	@SideOnly(Side.CLIENT)
+	@SuppressWarnings({"unchecked", "rawtypes"})
 	public void addInformation(ItemStack stack, EntityPlayer player, List tooltip, boolean extra) {
 		Block b = this.field_150939_a;
-
-		if (b == RS2Blocks.blockToolBox || b == RS2Blocks.blockToolBoxResis) {
-			if (stack.hasTagCompound()) {
-
-				if (stack.getTagCompound().hasKey("recsyscletem|toolbox")) {
-					tooltip.add(StatCollector.translateToLocal("tooltip.tntptool.toolbox.content"));
-					if (PistonToolbox.isShiftDown()) {
-						NBTTagCompound tag = (NBTTagCompound) stack.getTagCompound().getTag("recsyscletem|toolbox");
-						boolean craftUpgrade = tag.getBoolean("craft");
-						boolean resisUpgrade = tag.getBoolean("resis");
-						boolean storaUpgrade = tag.getBoolean("stora");
-						boolean securUpgrade = tag.getBoolean("secur");
-						boolean pickupUpgrade = tag.getBoolean("picku");
-						if (craftUpgrade) {
-							tooltip.add(StatCollector.translateToLocal("tooltip.tntptool.toolbox.craft"));
-						}
-						if (resisUpgrade) {
-							tooltip.add(StatCollector.translateToLocal("tooltip.tntptool.toolbox.exploresis"));
-						}
-						if (storaUpgrade) {
-							tooltip.add(StatCollector.translateToLocal("tooltip.tntptool.toolbox.storage"));
-						}
-						if (securUpgrade) {
-							tooltip.add(StatCollector.translateToLocal("tooltip.tntptool.toolbox.security"));
-						}
-						int inf = tag.getInteger("infStorageUpgrade");
-						if (inf > 0) {
-							tooltip.add(StatCollector.translateToLocalFormatted("tooltip.tntptool.toolbox.inf", inf));
-						}
-						if (pickupUpgrade) {
-							tooltip.add(StatCollector.translateToLocal("tooltip.tntptool.toolbox.pickup"));
-							int infLimit = (int) (TileToolbox.cfgStorageLimit * Math.pow(2, inf));
-							for (int i = 0; i < 2; i++) {
-								NBTTagCompound infTag = tag.getCompoundTag("inf" + i);
-								int infc = infTag.getInteger("infCount");
-								ItemStack infStack = ItemStack.loadItemStackFromNBT(infTag);
-								if (infStack != null && infStack.stackSize > 0) {
-									tooltip.add(EnumChatFormatting.YELLOW + infStack.getDisplayName());
-									tooltip.add(EnumChatFormatting.YELLOW + StatCollector.translateToLocalFormatted(
-											"tooltip.tntptool.toolbox.inf_storage", infc, infLimit));
-								}
-							}
-						}
-
-					} else {
-						tooltip.add(StatCollector.translateToLocal("tooltip.tntptool.shift"));
-					}
-
-				}
-			}
+		
+		if (b != ModObjects.blockToolBox && b != ModObjects.blockToolBoxResis) {
+			return;
 		}
 
+		NBTToolbox tagToolbox = NBTToolbox.fromItemStack(stack);
+		if (tagToolbox == null) {
+			return;
+		}
+		
+		if (!ModUtils.isShiftDown()) {
+			tooltip.add(StatCollector.translateToLocal("tooltip."+ModInfo.ID +".shift"));
+		}
+		
+		ToolboxStatus status = new ToolboxStatus();
+		status.readFromNBT(tagToolbox);
+		new ToolboxTooltip(status).addTooltips(tagToolbox, tooltip);
 	}
 
 }
