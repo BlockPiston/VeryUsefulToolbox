@@ -1,9 +1,9 @@
-#Recsyscletem 2
-itemGroup.vutoolbox.creativetab=Piston's Toolbox
 
-tile.blockToolbox.name=Tool Box
-tile.blockToolboxResis.name=Reinforced Tool Box
-tile.blockToolboxWithUser.name=%s's Tool Box
+itemGroup.vutoolbox.creativetab=Very Useful Toolbox
+
+tile.blockToolbox.name=Toolbox
+tile.blockToolboxResis.name=Reinforced Toolbox
+tile.blockToolboxWithUser.name=%s's Toolbox
 
 item.itemChipset.name=Chipset
 item.itemChipsetSeal.name=Chipset Seal
@@ -21,7 +21,7 @@ item.itemChipsetCorePickup.name=Pick-up Core
 item.itemChipsetUpgradePickup.name=Pick-up Upgrade
 
 tooltip.vutoolbox.shift=<Sneak for more info>
-tooltip.vutoolbox.toolbox.content=Contains Tools
+tooltip.vutoolbox.toolbox.content=In Use
 tooltip.vutoolbox.toolbox.craft=§6Crafting Upgrade§r
 tooltip.vutoolbox.toolbox.storage=§bStorage Upgrade§r
 tooltip.vutoolbox.toolbox.exploresis=§5Resistance Upgrade§r

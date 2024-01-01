@@ -12,10 +12,10 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import pistonmc.vutoolbox.ModInfo;
+import pistonmc.vutoolbox.ModNetwork;
 import pistonmc.vutoolbox.ModUtils;
 import pistonmc.vutoolbox.core.Toolbox;
 import pistonmc.vutoolbox.event.MessageToolBoxUpdate;
-import pistonmc.vutoolbox.event.RS2Network;
 import pistonmc.vutoolbox.low.NBTToolbox;
 
 public class TileToolbox extends TileEntity implements ISidedInventory {
@@ -182,7 +182,7 @@ public class TileToolbox extends TileEntity implements ISidedInventory {
 				workCount = 0;
 			}
 			if (invModified) {
-				RS2Network.network.sendToAllAround(new MessageToolBoxUpdate(this),
+				ModNetwork.network.sendToAllAround(new MessageToolBoxUpdate(this),
 						new TargetPoint(worldObj.provider.dimensionId, xCoord, yCoord, zCoord, 64));
 				invModified = false;
 			}

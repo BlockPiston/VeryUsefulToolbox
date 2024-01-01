@@ -1,17 +1,56 @@
-package com.tntp.tntptool.container;
+package pistonmc.vutoolbox.gui;
 
 import net.minecraft.inventory.IInventory;
+import net.minecraft.inventory.Slot;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import pistonmc.vutoolbox.ModObjects;
 
-public class SlotToolBox extends SlotToolBoxStackable {
+public class SlotToolBox extends Slot {
+	
+	private boolean onlyAllowUnstackable;
+	private boolean isSingleItemSlot;
 
-	public SlotToolBox(IInventory p_i1824_1_, int p_i1824_2_, int p_i1824_3_, int p_i1824_4_) {
-		super(p_i1824_1_, p_i1824_2_, p_i1824_3_, p_i1824_4_);
-		// TODO Auto-generated constructor stub
+	public SlotToolBox(IInventory inventory, int index, int x, int y) {
+		super(inventory, index, x, y);
+		isSingleItemSlot = true;
+	}
+	
+	public void setOnlyAllowUnstackable() {
+		onlyAllowUnstackable = true;
+	}
+	
+	public void setAllowStackable() {
+		isSingleItemSlot = false;
+	}
+	
+	@Override
+	public boolean isItemValid(ItemStack stack) {
+		if (stack == null) {
+			return true;
+		}
+		// toolboxes cannot be put in
+		Item item = stack.getItem();
+		if (item == Item.getItemFromBlock(ModObjects.blockToolBox)) {
+			return false;
+		}
+		if (item == Item.getItemFromBlock(ModObjects.blockToolBoxResis)) {
+			return false;
+		}
+		if (onlyAllowUnstackable) {
+			if (stack.isStackable()) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	@Override
 	public int getSlotStackLimit() {
-		return 1;
+		if (isSingleItemSlot) {
+			return 1;
+		}
+		return super.getSlotStackLimit();
 	}
 
 }

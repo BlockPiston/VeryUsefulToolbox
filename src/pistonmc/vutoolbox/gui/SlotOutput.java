@@ -1,14 +1,16 @@
-package com.tntp.tntptool.container;
+package pistonmc.vutoolbox.gui;
 
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 
+/**
+ * A slot that player cannot put stuff in manually
+ */
 public class SlotOutput extends Slot {
 
-	public SlotOutput(IInventory p_i1824_1_, int p_i1824_2_, int p_i1824_3_, int p_i1824_4_) {
-		super(p_i1824_1_, p_i1824_2_, p_i1824_3_, p_i1824_4_);
-		// TODO Auto-generated constructor stub
+	public SlotOutput(IInventory inventory, int index, int x, int y) {
+		super(inventory, index, x, y);
 	}
 
 	@Override

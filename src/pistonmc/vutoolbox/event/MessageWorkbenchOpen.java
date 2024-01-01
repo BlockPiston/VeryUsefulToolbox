@@ -1,6 +1,4 @@
-package com.tntp.tntptool.network;
-
-import com.tntp.tntptool.container.ContainerWorkbenchEx;
+package pistonmc.vutoolbox.event;
 
 import cpw.mods.fml.common.network.simpleimpl.IMessage;
 import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
@@ -8,20 +6,24 @@ import cpw.mods.fml.common.network.simpleimpl.MessageContext;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.play.server.S2DPacketOpenWindow;
+import pistonmc.vutoolbox.gui.ContainerWorkbenchAlwaysInteractable;
 
-public class MessageWorkbench implements IMessage {
+/**
+ * Message to open crafting table GUI
+ */
+public class MessageWorkbenchOpen implements IMessage {
 	private int x;
 	private int y;
 	private int z;
 
-	public MessageWorkbench(int x, int y, int z) {
+	public MessageWorkbenchOpen(int x, int y, int z) {
 		this.x = x;
 		this.y = y;
 		this.z = z;
 
 	}
 
-	public MessageWorkbench() {
+	public MessageWorkbenchOpen() {
 
 	}
 
@@ -41,10 +43,10 @@ public class MessageWorkbench implements IMessage {
 
 	}
 
-	public static class Handler implements IMessageHandler<MessageWorkbench, IMessage> {
+	public static class Handler implements IMessageHandler<MessageWorkbenchOpen, IMessage> {
 
 		@Override
-		public IMessage onMessage(MessageWorkbench message, MessageContext ctx) {
+		public IMessage onMessage(MessageWorkbenchOpen message, MessageContext ctx) {
 			EntityPlayerMP player = ctx.getServerHandler().playerEntity;
 
 			player.getNextWindowId();

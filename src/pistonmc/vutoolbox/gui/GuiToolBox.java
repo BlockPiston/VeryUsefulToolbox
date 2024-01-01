@@ -169,7 +169,7 @@ public class GuiToolBox extends GuiContainerEx {
 		super.mouseClicked(x, y, button);
 		if (GuiUtil.isMouseOverSlot(195, 21, x, y, guiLeft, guiTop)) {
 			if (box.hasCraftUpgrade()) {
-				RS2Network.network.sendToServer(new MessageWorkbench(box.xCoord, box.yCoord, box.zCoord));
+				RS2Network.network.sendToServer(new MessageWorkbenchOpen(box.xCoord, box.yCoord, box.zCoord));
 			}
 		}
 	}

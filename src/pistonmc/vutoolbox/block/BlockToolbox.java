@@ -18,14 +18,14 @@ import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
 import pistonmc.vutoolbox.ModCreativeTab;
 import pistonmc.vutoolbox.ModInfo;
+import pistonmc.vutoolbox.ModNetwork;
 import pistonmc.vutoolbox.ModObjects;
 import pistonmc.vutoolbox.ModUtils;
 import pistonmc.vutoolbox.OtherConfig;
 import pistonmc.vutoolbox.PistonToolbox;
 import pistonmc.vutoolbox.core.Toolbox;
 import pistonmc.vutoolbox.event.MessageToolBoxSecurity;
-import pistonmc.vutoolbox.event.RS2Network;
-import pistonmc.vutoolbox.gui.ContainerToolBox2;
+import pistonmc.vutoolbox.gui.ContainerToolbox;
 import pistonmc.vutoolbox.gui.GuiToolBox;
 import pistonmc.vutoolbox.gui.SlotToolBoxUnstackable;
 import pistonmc.vutoolbox.low.NBTToolbox;
@@ -145,7 +145,7 @@ public class BlockToolbox extends BlockContainer {
 			if (inventory != null) {
 				if (inventory.hasSecurityUpgrade()) {
 					if (!inventory.isOwner(player.getUniqueID())) {
-						RS2Network.network.sendTo(new MessageToolBoxSecurity(inventory.getOwner()),
+						ModNetwork.network.sendTo(new MessageToolBoxSecurity(inventory.getOwner()),
 								(EntityPlayerMP) player);
 						return true;
 					}
@@ -238,12 +238,12 @@ public class BlockToolbox extends BlockContainer {
 				if (inventory != null) {
 					if (inventory.hasSecurityUpgrade()) {
 						if (!inventory.isOwner(player.getUniqueID())) {
-							RS2Network.network.sendTo(new MessageToolBoxSecurity(inventory.getOwner()),
+							ModNetwork.network.sendTo(new MessageToolBoxSecurity(inventory.getOwner()),
 									(EntityPlayerMP) player);
 							return;
 						}
 					}
-					ContainerToolBox2 container = new ContainerToolBox2(inventory, player.inventory);
+					ContainerToolbox container = new ContainerToolbox(inventory, player.inventory);
 					container.transferStackInSlot(player, player.inventory.currentItem + 88);
 					player.inventory.markDirty();
 					inventory.markDirty();

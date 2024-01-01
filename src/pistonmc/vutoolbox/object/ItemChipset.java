@@ -1,4 +1,4 @@
-package pistonmc.vutoolbox.item;
+package pistonmc.vutoolbox.object;
 
 import java.util.List;
 
