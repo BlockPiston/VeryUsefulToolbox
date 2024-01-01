@@ -22,8 +22,8 @@ import pistonmc.vutoolbox.ModNetwork;
 import pistonmc.vutoolbox.ModObjects;
 import pistonmc.vutoolbox.ModUtils;
 import pistonmc.vutoolbox.OtherConfig;
-import pistonmc.vutoolbox.PistonToolbox;
 import pistonmc.vutoolbox.core.Toolbox;
+import pistonmc.vutoolbox.core.Upgrades;
 import pistonmc.vutoolbox.event.MessageToolBoxSecurity;
 import pistonmc.vutoolbox.gui.ContainerToolbox;
 import pistonmc.vutoolbox.gui.GuiToolBox;
@@ -104,7 +104,7 @@ public class BlockToolbox extends BlockContainer {
 	public void breakBlock(World world, int x, int y, int z, Block block, int meta) {
 		TileToolbox tile = TileToolbox.cast(world.getTileEntity(x, y, z));
 		if (tile != null) {
-			Block blockType = tile.hasResistanceUpgrade() ? ModObjects.blockToolBoxResis : ModObjects.blockToolBox;
+			Block blockType = tile.getToolbox().getUpgrades().isEnabled(Upgrades.RESIS) ? ModObjects.blockToolBoxResis : ModObjects.blockToolBox;
 			NBTToolbox tagToolbox = new NBTToolbox(new NBTTagCompound());
 			tile.writeToolboxToNBT(tagToolbox);
 			float dx = ModUtils.RNG.nextFloat() * 0.8F + 0.1F;

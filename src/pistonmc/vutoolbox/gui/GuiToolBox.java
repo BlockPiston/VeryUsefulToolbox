@@ -1,4 +1,4 @@
-package com.tntp.tntptool.gui;
+package pistonmc.vutoolbox.gui;
 
 import java.util.ArrayList;
 import java.util.List;

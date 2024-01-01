@@ -62,32 +62,6 @@ public class ModUtils {
 	public static void printChatMessage(String message) {
 		Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new ChatComponentText(message));
 	}
-	
 
-	/**
-	 * Writes a compressed NBTTagCompound to this buffer
-	 */
-	public static void writeNBTTagCompoundToBuffer(ByteBuf buf, NBTTagCompound p_150786_1_) throws IOException {
-		if (p_150786_1_ == null) {
-			buf.writeShort(-1);
-		} else {
-			byte[] abyte = CompressedStreamTools.compress(p_150786_1_);
-			buf.writeShort((short) abyte.length);
-			buf.writeBytes(abyte);
-		}
-	}
 
-	/**
-	 * Reads a compressed NBTTagCompound from this buffer
-	 */
-	public static NBTTagCompound readNBTTagCompoundFromBuffer(ByteBuf buf) throws IOException {
-		short short1 = buf.readShort();
-		if (short1 < 0) {
-			return null;
-		} else {
-			byte[] abyte = new byte[short1];
-			buf.readBytes(abyte);
-			return CompressedStreamTools.func_152457_a(abyte, new NBTSizeTracker(2097152L));
-		}
-	}
 }

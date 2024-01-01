@@ -2,97 +2,112 @@ package pistonmc.vutoolbox.gui;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
-import net.minecraft.inventory.ICrafting;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import pistonmc.vutoolbox.block.TileToolbox;
+import pistonmc.vutoolbox.core.BigItemStack;
 import pistonmc.vutoolbox.core.Toolbox;
+import pistonmc.vutoolbox.core.Upgrades;
+import pistonmc.vutoolbox.low.SlotLayouter;
 
 public class ContainerToolbox extends Container {
 	private TileToolbox tile;
-	
-	private int[] lastInfCount;
-	private int[] lastInfMetadata;
-	private short lastUpgrades;
-	private int lastInfUpgrade;
+//	
+//	private int[] lastInfCount;
+//	private int[] lastInfMetadata;
+//	private short lastUpgrades;
+//	private int lastInfUpgrade;
 
 	public ContainerToolbox(TileToolbox tile, IInventory playerInventory) {
-		super(tile, playerInventory, 11, 132);
 		this.tile = tile;
-		setupMachineSlots();
-		machineSlots = machine.getSizeInventory();
-		machine.openInventory();
-		for (int k = 0; k < 3; k++) {
-			for (int j = 0; j < 9; j++) {
-				this.addSlotToContainer(
-						new Slot(playerInventory, j + 9 + k * 9, playerInvX + j * 18, playerInvY + k * 18));
-			}
-		}
-		for (int j = 0; j < 9; j++) {
-			this.addSlotToContainer(new Slot(playerInventory, j, playerInvX + j * 18, 58 + playerInvY));
-		}
-		lastInfCount = new int[2];
-		lastInfMetadata = new int[2];
+		setupSlots(playerInventory);
+		
+//		lastInfCount = new int[2];
+//		lastInfMetadata = new int[2];
 	}
 	
-	@Override
-	public void setupMachineSlots() {
-		int i = 0;
+	public void setupSlots(IInventory playerInventory) {
+		SlotLayouter layout = new SlotLayouter();
 		// top slots can only put unstackable items
-		for (int j = 0; j < Toolbox.NUM_TOP_SLOTS; j++) {
-			SlotToolbox slot =
-			this.addSlotToContainer(new SlotToolBoxUnstackable(machine, i, 33 + j * 18, 21));
-			//setonlyallowunstackable
-			i++;
+		layout.anchorTo(33, 21, Toolbox.NUM_TOP_SLOTS);
+		for (int i = 0; i < Toolbox.NUM_TOP_SLOTS; i++) {
+			SlotToolbox slot = new SlotToolbox(tile, layout.getIndex(), layout.getX(), layout.getY());
+			slot.setOnlyAllowUnstackable();
+			this.addSlotToContainer(slot);
+			layout.next();
 		}
-		for (int k = 0; k < 3; k++) {
-			for (int j = 0; j < 5; j++) {
-				this.addSlotToContainer(new SlotToolbox2(machine, i, 11 + j * 18, 42 + k * 18));
-				i++;
+		
+		layout.anchorTo(11, 42, 5);
+		for (int i = 0; i < Toolbox.NUM_MIDDLE_LEFT_SLOTS; i++) {
+			SlotToolbox slot = new SlotToolbox(tile, layout.getIndex(), layout.getX(), layout.getY());
+			this.addSlotToContainer(slot);
+			layout.next();
+		}
+		
+		layout.anchorTo(103, 42, 3);
+		for (int i = 0; i < Toolbox.NUM_MIDDLE_SLOTS; i++) {
+			SlotToolbox slot = new SlotToolbox(tile, layout.getIndex(), layout.getX(), layout.getY());
+			this.addSlotToContainer(slot);
+			layout.next();
+		}
+		
+		// middle right can be upgraded to allow stackable
+		layout.anchorTo(159, 42, 3);
+		boolean upgraded = tile.getToolbox().getUpgrades().isEnabled(Upgrades.STORAGE);
+		for (int i = 0; i < Toolbox.NUM_MIDDLE_RIGHT_SLOTS; i++) {
+			SlotToolbox slot = new SlotToolbox(tile, layout.getIndex(), layout.getX(), layout.getY());
+			if (upgraded) {
+				slot.setAllowStackable();
 			}
+			this.addSlotToContainer(slot);
+			layout.next();
 		}
-		for (int k = 0; k < 3; k++) {
-			for (int j = 0; j < 3; j++) {
-				this.addSlotToContainer(new SlotToolbox2(machine, i, 103 + j * 18, 42 + k * 18));
-				i++;
-			}
-		}
-		for (int k = 0; k < 3; k++) {
-			for (int j = 0; j < 3; j++) {
-				if (machine.hasStorageUpgrade()) {
-					this.addSlotToContainer(new SlotToolBoxStackable(machine, i, 159 + j * 18, 42 + k * 18));
-					//set allow stackable
-				}
-					
-				else {
-					this.addSlotToContainer(new SlotToolbox2(machine, i, 159 + j * 18, 42 + k * 18));
-				}
-					
-				i++;
-			}
-		}
-		for (int j = 0; j < 9; j++) {
-			this.addSlotToContainer(new SlotToolBoxStackable(machine, i, 11 + j * 18, 99));
-			//set allow stackable
-			i++;
+		
+		// bottom slots always allow stackable
+		layout.anchorTo(11, 99, Toolbox.NUM_BOTTOM_SLOTS);
+		for (int i = 0; i < Toolbox.NUM_BOTTOM_SLOTS; i++) {
+			SlotToolbox slot = new SlotToolbox(tile, layout.getIndex(), layout.getX(), layout.getY());
+			slot.setAllowStackable();
+			this.addSlotToContainer(slot);
+			layout.next();
 		}
 	
-		for (int k = 0; k < 3; k++) {
-			for (int j = 0; j < 2; j++) {
-				this.addSlotToContainer(new SlotToolbox2(machine, i, 177 + j * 18, 154 + k * 18));
-				i++;
-			}
+		// upgrade slots can actually hold any item
+		layout.anchorTo(177, 154, 2);
+		for (int i = 0; i < Toolbox.NUM_UPGRADE_SLOTS; i++) {
+			SlotToolbox slot = new SlotToolbox(tile, layout.getIndex(), layout.getX(), layout.getY());
+			this.addSlotToContainer(slot);
+			layout.next();
 		}
-		for (int j = 0; j < 2; j++) {
-			this.addSlotToContainer(new SlotToolBoxStackable(machine, i, 177 + j * 18, 99));
-			//set allow stackable
-			i++;
+
+		// infinity input
+		layout.anchorTo(177, 99, Toolbox.NUM_INFINITY_SLOTS);
+		for (int i = 0; i < Toolbox.NUM_INFINITY_SLOTS; i++) {
+			SlotToolbox slot = new SlotToolbox(tile, layout.getIndex(), layout.getX(), layout.getY());
+			slot.setAllowStackable();
+			this.addSlotToContainer(slot);
+			layout.next();
 		}
-		for (int j = 0; j < 2; j++) {
-			this.addSlotToContainer(new SlotOutput(machine, i, 177 + j * 18, 135));
-			i++;
+		// output
+		layout.anchorTo(177, 135, Toolbox.NUM_INFINITY_SLOTS);
+		for (int i = 0; i < 2; i++) {
+			Slot slot = new SlotOutput(tile, layout.getIndex(), layout.getX(), layout.getY());
+			this.addSlotToContainer(slot);
+			layout.next();
+		}
+		
+		// player inventory
+		SlotLayouter playerLayout = new SlotLayouter();
+		playerLayout.anchorTo(11, 132, 9);
+		for (int i = 0; i < 27; i++) {
+			Slot slot = new Slot(playerInventory, playerLayout.getIndex(), playerLayout.getX(), playerLayout.getY());
+			this.addSlotToContainer(slot);
+		}
+		playerLayout.anchorTo(11, 190, 9);
+		for (int i = 0; i < 9; i++) {
+			Slot slot = new Slot(playerInventory, playerLayout.getIndex(), playerLayout.getX(), playerLayout.getY());
+			this.addSlotToContainer(slot);
 		}
 	}
 
@@ -193,124 +208,132 @@ public class ContainerToolbox extends Container {
 
 	@Override
 	public ItemStack transferStackInSlot(EntityPlayer player, int index) {
+		Slot slot = (Slot) this.inventorySlots.get(index);
+		if (slot == null || !slot.getHasStack()) {
+			return null;
+		}
 		int machineSlots = tile.getSizeInventory();
 		ItemStack itemstack = null;
-		Slot slot = (Slot) this.inventorySlots.get(index);
-		if (slot != null && slot.getHasStack()) {
-			ItemStack itemstack1 = slot.getStack();
-			itemstack = itemstack1.copy();
+		
+		ItemStack slotStack = slot.getStack();
+		itemstack = slotStack.copy();
 
-			if (index < machineSlots) {
-				if (!this.mergeItemStack(itemstack1, machineSlots, this.inventorySlots.size(), true)) {
+		if (index < machineSlots) {
+			if (!this.mergeItemStack(slotStack, machineSlots, this.inventorySlots.size(), true)) {
+				return null;
+			}
+		} else {
+			// I don't remember what this logic is meant to do when I wrote it
+			// just keeping it like this unless I see something weird
+			
+			int start = -1;
+			int end = -1;
+			Toolbox toolbox = tile.getToolbox();
+			
+			int stackableStart = toolbox.getStackableSlotsStart();
+			for (int i = 0; i < Toolbox.NUM_INFINITY_SLOTS; i++) {
+				BigItemStack infSlot = toolbox.getInfinityStack(i);
+				ItemStack infStack = infSlot.getItemStack();
+				if (infStack != null && infSlot.getCount() < toolbox.getUpgrades().getInfinityStackLimit()) {
+					if (infStack.isItemEqual(slotStack) && ItemStack.areItemStackTagsEqual(infStack, slotStack)) {
+						start = Toolbox.INFINITY_SLOTS_START + i;
+						end = start + 1;
+						break;
+					}
+				}
+			}
+			if (start == -1) {
+				if (slotStack.isStackable()) {
+					start = stackableStart;
+					end = Toolbox.UPGRADE_SLOTS_START;
+				} else {
+					start = Toolbox.NUM_TOP_SLOTS;
+					end = machineSlots;
+				}
+			}
+			if (!this.mergeItemStack(slotStack, start, end, false)) {
+				if (start > stackableStart && slotStack.isStackable()) {
+					// try stackable slots
+					if (!this.mergeItemStack(slotStack, stackableStart, Toolbox.UPGRADE_SLOTS_START, false)) {
+						if (!this.mergeItemStack(slotStack, Toolbox.NUM_TOP_SLOTS, machineSlots, false)) {
+							return null;
+						}
+					}
+				} else if (!this.mergeItemStack(slotStack, Toolbox.NUM_TOP_SLOTS, machineSlots, false)) {
 					return null;
 				}
-			} else {
-
-				int start = -1;
-				int end = -1;
-				int stackableStart = machine.hasStorageUpgrade() ? 33 : 42;
-				for (int i = 0; i < 2; i++) {
-					ItemStack inf = machine.getInfStorage(i);
-					if (inf != null && machine.getInfCount(i) < machine.getInfLimit()) {
-						if (inf.isItemEqual(itemstack1) && ItemStack.areItemStackTagsEqual(inf, itemstack1)) {
-							start = 57 + i;
-							end = 58 + i;
-							break;
-						}
-					}
-				}
-				if (start == -1) {
-					if (itemstack1.isStackable()) {
-						start = stackableStart;
-						end = 51;
-					} else {
-						start = 9;
-						end = machineSlots;
-					}
-				}
-				if (!this.mergeItemStack(itemstack1, start, end, false)) {
-					if (start > stackableStart && itemstack1.isStackable()) {
-						// try stackable slots
-						if (!this.mergeItemStack(itemstack1, stackableStart, 51, false)) {
-							if (!this.mergeItemStack(itemstack1, 9, machineSlots, false)) {
-								return null;
-							}
-						}
-					} else if (!this.mergeItemStack(itemstack1, 9, machineSlots, false)) {
-						return null;
-					}
-				}
-			}
-
-			if (itemstack1.stackSize == 0) {
-				slot.putStack((ItemStack) null);
-			} else {
-				slot.onSlotChanged();
 			}
 		}
+
+		if (slotStack.stackSize == 0) {
+			slot.putStack((ItemStack) null);
+		} else {
+			slot.onSlotChanged();
+		}
+		
 
 		return itemstack;
 	}
 
-	@Override
-	public void addCraftingToCrafters(ICrafting craft) {
-		super.addCraftingToCrafters(craft);
-		craft.sendProgressBarUpdate(this, 0, machine.getInfCount(0));
-		craft.sendProgressBarUpdate(this, 1, machine.getInfCount(1));
-		for (int i = 0; i < 2; i++) {
-			ItemStack is = machine.getInfStorage(i);
-			int id = is == null ? -1 : Item.getIdFromItem(is.getItem());
-			craft.sendProgressBarUpdate(this, 2 + i, id);
-			if (is != null)
-				craft.sendProgressBarUpdate(this, 4 + i, is.getItemDamage());
-		}
-		craft.sendProgressBarUpdate(this, 6, machine.getShortFromFourUpgrades());
-		craft.sendProgressBarUpdate(this, 7, machine.getInfUpgrade());
-	}
-
-	@Override
-	public void updateProgressBar(int bar, int progress) {
-		if (bar <= 1) {
-			machine.setInfStorageCount(bar, progress);
-		} else if (bar <= 3) {
-			ItemStack s = progress == -1 ? null : new ItemStack(Item.getItemById(progress));
-			machine.setInfStorage(bar - 2, s);
-		} else if (bar <= 5) {
-			machine.setInfStorageMetadata(bar - 4, progress);
-		} else if (bar == 6) {
-			machine.setFourUpgradesFromShort((short) progress);
-		} else if (bar == 7) {
-			machine.setInfUpgrade(progress);
-		}
-
-	}
-
-	@Override
-	public void detectAndSendChanges() {
-		super.detectAndSendChanges();
-		for (Object obj : this.crafters) {
-			ICrafting c = (ICrafting) obj;
-			for (int i = 0; i < 2; i++) {
-				if (lastInfCount[i] != machine.getInfCount(i)) {
-					c.sendProgressBarUpdate(this, i, machine.getInfCount(i));
-				}
-				if (lastInfMetadata[i] != machine.getInfStorageMetadata(i)) {
-					c.sendProgressBarUpdate(this, i + 4, machine.getInfStorageMetadata(i));
-				}
-			}
-			if (lastUpgrades != machine.getShortFromFourUpgrades()) {
-				c.sendProgressBarUpdate(this, 6, machine.getShortFromFourUpgrades());
-			}
-			if (lastInfUpgrade != machine.getInfUpgrade()) {
-				c.sendProgressBarUpdate(this, 7, machine.getInfUpgrade());
-			}
-		}
-		for (int i = 0; i < 2; i++) {
-			lastInfCount[i] = machine.getInfCount(i);
-			lastInfMetadata[i] = machine.getInfStorageMetadata(i);
-		}
-		lastUpgrades = machine.getShortFromFourUpgrades();
-		lastInfUpgrade = machine.getInfUpgrade();
-	}
+//	@Override
+//	public void addCraftingToCrafters(ICrafting craft) {
+//		super.addCraftingToCrafters(craft);
+//		craft.sendProgressBarUpdate(this, 0, machine.getInfCount(0));
+//		craft.sendProgressBarUpdate(this, 1, machine.getInfCount(1));
+//		for (int i = 0; i < 2; i++) {
+//			ItemStack is = machine.getInfStorage(i);
+//			int id = is == null ? -1 : Item.getIdFromItem(is.getItem());
+//			craft.sendProgressBarUpdate(this, 2 + i, id);
+//			if (is != null)
+//				craft.sendProgressBarUpdate(this, 4 + i, is.getItemDamage());
+//		}
+//		craft.sendProgressBarUpdate(this, 6, machine.getShortFromFourUpgrades());
+//		craft.sendProgressBarUpdate(this, 7, machine.getInfUpgrade());
+//	}
+//
+//	@Override
+//	public void updateProgressBar(int bar, int progress) {
+//		if (bar <= 1) {
+//			machine.setInfStorageCount(bar, progress);
+//		} else if (bar <= 3) {
+//			ItemStack s = progress == -1 ? null : new ItemStack(Item.getItemById(progress));
+//			machine.setInfStorage(bar - 2, s);
+//		} else if (bar <= 5) {
+//			machine.setInfStorageMetadata(bar - 4, progress);
+//		} else if (bar == 6) {
+//			machine.setFourUpgradesFromShort((short) progress);
+//		} else if (bar == 7) {
+//			machine.setInfUpgrade(progress);
+//		}
+//
+//	}
+//
+//	@Override
+//	public void detectAndSendChanges() {
+//		super.detectAndSendChanges();
+//		for (Object obj : this.crafters) {
+//			ICrafting c = (ICrafting) obj;
+//			for (int i = 0; i < 2; i++) {
+//				if (lastInfCount[i] != machine.getInfCount(i)) {
+//					c.sendProgressBarUpdate(this, i, machine.getInfCount(i));
+//				}
+//				if (lastInfMetadata[i] != machine.getInfStorageMetadata(i)) {
+//					c.sendProgressBarUpdate(this, i + 4, machine.getInfStorageMetadata(i));
+//				}
+//			}
+//			if (lastUpgrades != machine.getShortFromFourUpgrades()) {
+//				c.sendProgressBarUpdate(this, 6, machine.getShortFromFourUpgrades());
+//			}
+//			if (lastInfUpgrade != machine.getInfUpgrade()) {
+//				c.sendProgressBarUpdate(this, 7, machine.getInfUpgrade());
+//			}
+//		}
+//		for (int i = 0; i < 2; i++) {
+//			lastInfCount[i] = machine.getInfCount(i);
+//			lastInfMetadata[i] = machine.getInfStorageMetadata(i);
+//		}
+//		lastUpgrades = machine.getShortFromFourUpgrades();
+//		lastInfUpgrade = machine.getInfUpgrade();
+//	}
 
 }
