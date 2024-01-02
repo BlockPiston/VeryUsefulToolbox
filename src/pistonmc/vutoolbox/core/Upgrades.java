@@ -43,7 +43,7 @@ public class Upgrades {
 	}
 	
 	public int getInfinityStackLimit() {
-		return (int) (Config.getInfinityStorageLimit() * Math.pow(2, infinityCount));
+		return (int) (Config.infinityStorageLimit.get() * Math.pow(2, infinityCount));
 	}
 	
 	public void writeToNBT(NBTTagCompound tag) {

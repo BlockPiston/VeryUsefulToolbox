@@ -250,6 +250,9 @@ public class Toolbox {
 		BigItemStack infStack = infinitySlots[infSlot];
 		ItemStack currentInfItem = infStack.getItemStack();
 		int currentInfCount = infStack.getCount();
+		if (currentInfCount >= infLimit) {
+			return false;
+		}
 		if (currentInfItem == null) {
 			// inf slot is empty, put in the stack
 			int putIn = Math.min(inputStack.stackSize, infLimit);

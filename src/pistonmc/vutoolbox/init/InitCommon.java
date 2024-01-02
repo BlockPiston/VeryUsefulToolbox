@@ -8,7 +8,7 @@ import cpw.mods.fml.common.registry.GameRegistry;
 import net.minecraftforge.common.MinecraftForge;
 import pistonmc.vutoolbox.ModGui;
 import pistonmc.vutoolbox.ModInfo;
-import pistonmc.vutoolbox.ModNetwork;
+import pistonmc.vutoolbox.core.Config;
 import pistonmc.vutoolbox.event.ToolboxPickupUpgradeEventHandler;
 import pistonmc.vutoolbox.object.BlockToolbox;
 import pistonmc.vutoolbox.object.ItemBlockToolbox;
@@ -19,6 +19,7 @@ public class InitCommon implements Init {
 
 	@Override
 	public void preInit(FMLPreInitializationEvent event) {
+		Config.load();
 		// Recsyscletem.log.info("Loading Configuration");
 		//ModConfig.loadConfigLoaders();
 		//PistonToolbox.cfg = ModConfig.loadConfiguration();
@@ -61,9 +62,8 @@ public class InitCommon implements Init {
 
 		// log.info("Register Events");
 		MinecraftForge.EVENT_BUS.register(new ToolboxPickupUpgradeEventHandler());
-
+		
 		// log.info("Init Network");
-		ModNetwork.registerMessages();
 
 		// log.info("Apply Config");
 		// Recsyscletem.log.info("Loading Config Stage 3");

@@ -26,11 +26,11 @@ import pistonmc.vutoolbox.core.Upgrades;
 import pistonmc.vutoolbox.gui.ContainerToolbox;
 import pistonmc.vutoolbox.gui.SlotToolbox;
 import pistonmc.vutoolbox.low.NBTToolbox;
-import pistonmc.vutoolbox.render.ModelToolbox;
 
 public class BlockToolbox extends BlockContainer {
 	public static final String NAME = "blockToolbox";
 	public static final boolean infoOnPlaced = false;
+	public static int rendererId = 0;
 
 	public BlockToolbox(boolean resistance) {
 		super(Material.rock);
@@ -47,7 +47,7 @@ public class BlockToolbox extends BlockContainer {
 	}
 	@Override
 	public int getRenderType() {
-		return ModelToolbox.rendererId;
+		return rendererId;
 	}
 
 	@Override
@@ -74,21 +74,28 @@ public class BlockToolbox extends BlockContainer {
 			facing = 4;
 		}
 		world.setBlockMetadataWithNotify(x, y, z, facing, 2);
-        TileToolbox tile = TileToolbox.cast(world.getTileEntity(x, y, z));
-        if (tile == null) {
-            return;
-        }
-        Toolbox toolbox = tile.getToolbox();
+		if (!world.isRemote) {
+			TileToolbox tile = TileToolbox.cast(world.getTileEntity(x, y, z));
+	        if (tile == null) {
+	            return;
+	        }
+	        Toolbox toolbox = tile.getToolbox();
 
-        NBTToolbox tag = NBTToolbox.fromItemStack(stack);
-        if (tag != null) {
-            tile.readToolboxFromNBT(tag);
-            toolbox.setOwner(entity);
-        }
-        if (stack.hasDisplayName()) {
-        	toolbox.setCustomName(stack.getDisplayName());
-        }
-		if (world.isRemote && Config.shouldDisplayInfoWhenPlacingToolbox()) {
+	        NBTToolbox tag = NBTToolbox.fromItemStack(stack);
+	        if (tag != null) {
+	            tile.readToolboxFromNBT(tag);
+	        }
+	        // set the new owner, if the player who placed the block has access
+	        if (entity instanceof EntityPlayer) {
+	        	EntityPlayer entityPlayer = (EntityPlayer) entity;
+	        	if (tile.isUseableByPlayer(entityPlayer)) {
+		        	toolbox.setOwner(entity); 
+	        	}
+	        }
+	        if (stack.hasDisplayName()) {
+	        	toolbox.setCustomName(stack.getDisplayName());
+	        }
+		} else if (Config.placeToolboxInfo.get()) {
 			ModUtils.printChatMessage(
 					StatCollector.translateToLocalFormatted("message."+ModInfo.ID+".toolbox_place", x, y, z));
 		}
@@ -99,6 +106,11 @@ public class BlockToolbox extends BlockContainer {
 	 */
 	@Override
 	public void breakBlock(World world, int x, int y, int z, Block block, int meta) {
+//		if (world.isRemote) {
+//			// no special logic on client side
+//			super.breakBlock(world, x, y, z, block, meta);
+//			return;
+//		}
 		TileToolbox tile = TileToolbox.cast(world.getTileEntity(x, y, z));
 		if (tile != null) {
 			Block blockType = tile.getToolbox().getUpgrades().isEnabled(Upgrades.RESIS) ? ModObjects.blockToolboxResis : ModObjects.blockToolbox;
@@ -114,7 +126,7 @@ public class BlockToolbox extends BlockContainer {
 				entityitem.getEntityItem().setStackDisplayName(tile.getInventoryName());
 			} else {
 				String ownerName = tile.getToolbox().getOwner();
-				if (ownerName == null || ownerName.isEmpty()) {
+				if (ownerName != null && !ownerName.isEmpty()) {
 					entityitem.getEntityItem().setStackDisplayName(
 							StatCollector.translateToLocalFormatted("tile."+NAME+"WithUser.name", ownerName));
 				}
@@ -137,10 +149,7 @@ public class BlockToolbox extends BlockContainer {
 	@Override
 	public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int side, float xx, float yy,
 			float zz) {
-		if (world.isRemote) {
-			// no special logic on client side
-			return true;
-		} 
+		
 		TileToolbox tile = TileToolbox.cast(world.getTileEntity(x, y, z));
 		if (tile == null) {
 			return true;
@@ -149,6 +158,10 @@ public class BlockToolbox extends BlockContainer {
 		if (!tile.tryAccessByPlayer(player, true)) {
 			return true;
 		}
+		if (world.isRemote) {
+			return true;
+		}
+		// server only
 		
 		if (side != 1) {
 			// not clicking top
@@ -211,10 +224,7 @@ public class BlockToolbox extends BlockContainer {
 
 	@Override
 	public void onBlockClicked(World world, int x, int y, int z, EntityPlayer player) {
-		if (world.isRemote) {
-			// no special logic on client side
-			return;
-		}
+		
 		if (!player.isSneaking()) {
 			return;
 		}
@@ -223,10 +233,13 @@ public class BlockToolbox extends BlockContainer {
 		if (tile == null) {
 			return;
 		}
-		
 			
 		// check if the toolbox is accessible
 		if (!tile.tryAccessByPlayer(player, true)) {
+			return;
+		}
+		if (world.isRemote) {
+			// no special logic on client side
 			return;
 		}
 		// put the item in

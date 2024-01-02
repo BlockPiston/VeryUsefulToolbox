@@ -39,6 +39,7 @@ public class ItemBlockToolbox extends ItemBlock {
 		
 		if (!ModUtils.isShiftDown()) {
 			tooltip.add(StatCollector.translateToLocal("tooltip."+ModInfo.ID +".shift"));
+			return;
 		}
 		
 		ToolboxStatus status = new ToolboxStatus();

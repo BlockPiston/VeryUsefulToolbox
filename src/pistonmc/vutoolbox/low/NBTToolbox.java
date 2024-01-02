@@ -1,10 +1,7 @@
 package pistonmc.vutoolbox.low;
 
-import java.util.BitSet;
 import java.util.UUID;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;

@@ -48,7 +48,6 @@ public class MessageToolboxRequest implements IMessage {
 	}
 
 	public static class Handler implements IMessageHandler<MessageToolboxRequest, IMessage> {
-
 		@Override
 		public IMessage onMessage(MessageToolboxRequest message, MessageContext ctx) {
 			WorldServer world = ctx.getServerHandler().playerEntity.mcServer.worldServerForDimension(message.dimension);

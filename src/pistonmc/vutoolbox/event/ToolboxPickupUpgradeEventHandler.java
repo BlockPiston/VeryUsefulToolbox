@@ -60,12 +60,12 @@ public class ToolboxPickupUpgradeEventHandler {
 			if (stack.stackSize != oldSize) {
 				taken = true;
 			}
+			
+			toolbox.writeToNBT(tagBox);
+			tagBox.setToItemStack(item);
 			if (stack.stackSize == 0) {
 				break;
 			}
-			toolbox.writeToNBT(tagBox);
-			tagBox.setToItemStack(item);
-
 		}
 	
 		if (stack.stackSize <= 0) {

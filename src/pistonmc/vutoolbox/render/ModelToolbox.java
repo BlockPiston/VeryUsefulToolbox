@@ -16,12 +16,13 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.World;
 import net.minecraftforge.client.ForgeHooksClient;
 import pistonmc.vutoolbox.ModInfo;
 import pistonmc.vutoolbox.ModObjects;
 import pistonmc.vutoolbox.core.Upgrades;
+import pistonmc.vutoolbox.object.BlockToolbox;
 import pistonmc.vutoolbox.object.TileToolbox;
-import pistonmc.vutoolbox.render.ModelAbstract.ItemRenderer;
 import pistonmc.vutoolbox.render.ToolboxSpecialRenderRegistry.ToolBoxRenderType;
 
 public class ModelToolbox extends ModelAbstract {
@@ -41,16 +42,28 @@ public class ModelToolbox extends ModelAbstract {
 		ItemRenderer r = new ItemRenderer(new TileToolbox());
 		RenderingRegistry.registerBlockHandler(r);
 		ClientRegistry.bindTileEntitySpecialRenderer(TileToolbox.class, new TileRenderer(this));
+		BlockToolbox.rendererId=rendererId;
 	}
 
 	@Override
 	public ResourceLocation getTexture(TileEntity tile) {
 		TileToolbox tileToolbox = TileToolbox.cast(tile);
-		if (tileToolbox != null && tileToolbox.getToolbox().getUpgrades().isEnabled(Upgrades.RESIS)) {
-			return textureResis;
-		} else {
-			return super.getTexture(tile);
+		if (tileToolbox != null) {
+			if (tileToolbox.getToolbox().getUpgrades().isEnabled(Upgrades.RESIS)) {
+				return textureResis;
+			}
+			// try world
+			World world = tileToolbox.getWorldObj();
+			if (world != null) {
+				Block b = world.getBlock(tileToolbox.xCoord, tileToolbox.yCoord, tileToolbox.zCoord);
+				if (b == ModObjects.blockToolboxResis) {
+					return textureResis;
+				}
+			}
 		}
+		
+		return super.getTexture(tile);
+		
 	}
 
 	@Override

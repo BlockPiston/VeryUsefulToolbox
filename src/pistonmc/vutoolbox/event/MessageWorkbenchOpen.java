@@ -44,7 +44,6 @@ public class MessageWorkbenchOpen implements IMessage {
 	}
 
 	public static class Handler implements IMessageHandler<MessageWorkbenchOpen, IMessage> {
-
 		@Override
 		public IMessage onMessage(MessageWorkbenchOpen message, MessageContext ctx) {
 			EntityPlayerMP player = ctx.getServerHandler().playerEntity;

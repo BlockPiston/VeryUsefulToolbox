@@ -36,6 +36,7 @@ public class TileToolbox extends TileEntity implements ISidedInventory {
 
 	public TileToolbox() {
 		toolbox = new Toolbox();
+		inventoryChanged = true;
 	}
 	
 	@Override

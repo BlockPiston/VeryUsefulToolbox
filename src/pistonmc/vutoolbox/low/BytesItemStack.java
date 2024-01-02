@@ -8,7 +8,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTSizeTracker;
 import net.minecraft.nbt.NBTTagCompound;
-import pistonmc.vutoolbox.ModUtils;
 
 public class BytesItemStack {
 	private ByteBuf buf;

@@ -4,15 +4,12 @@ import cpw.mods.fml.common.network.simpleimpl.IMessage;
 import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
 import cpw.mods.fml.common.network.simpleimpl.MessageContext;
 import io.netty.buffer.ByteBuf;
-import net.minecraft.util.StatCollector;
-import pistonmc.vutoolbox.ModInfo;
-import pistonmc.vutoolbox.ModUtils;
 
 /**
  * Message sent to the player trying to access someone else's toolbox
  */
 public class MessageToolboxSecurity implements IMessage {
-	private String ownerName;
+	public String ownerName;
 
 	public MessageToolboxSecurity() {
 
@@ -29,7 +26,6 @@ public class MessageToolboxSecurity implements IMessage {
 			chars[i] = buf.readChar();
 		}
 		ownerName = String.valueOf(chars);
-
 	}
 
 	@Override
@@ -38,15 +34,12 @@ public class MessageToolboxSecurity implements IMessage {
 		for (char c : ownerName.toCharArray()) {
 			buf.writeChar(c);
 		}
-
 	}
 
-	public static class Handler implements IMessageHandler<MessageToolboxSecurity, IMessage> {
+	public static class StubHandler implements IMessageHandler<MessageToolboxSecurity, IMessage> {
 
 		@Override
 		public IMessage onMessage(MessageToolboxSecurity message, MessageContext ctx) {
-			ModUtils.printChatMessage(
-					StatCollector.translateToLocalFormatted("message."+ModInfo.ID+".toolbox_security", message.ownerName));
 			return null;
 		}
 
