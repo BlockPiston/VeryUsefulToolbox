@@ -22,7 +22,7 @@ import pistonmc.vutoolbox.ModObjects;
 import pistonmc.vutoolbox.core.Upgrades;
 import pistonmc.vutoolbox.object.TileToolbox;
 import pistonmc.vutoolbox.render.ModelAbstract.ItemRenderer;
-import pistonmc.vutoolbox.render.Toolbox2SpecialRenderRegistry.ToolBoxRenderType;
+import pistonmc.vutoolbox.render.ToolboxSpecialRenderRegistry.ToolBoxRenderType;
 
 public class ModelToolbox extends ModelAbstract {
 	public static int rendererId = 0;
@@ -100,7 +100,7 @@ public class ModelToolbox extends ModelAbstract {
 	private void renderStack(ItemStack stack, int x, int y) {
 		if (stack != null) {
 			TextureManager tm = Minecraft.getMinecraft().getTextureManager();
-			ToolBoxRenderType type = Toolbox2SpecialRenderRegistry.getType(stack);
+			ToolBoxRenderType type = ToolboxSpecialRenderRegistry.getType(stack);
 			boolean special = false;
 			float above = 0.01f;
 			if (type != ToolBoxRenderType.TEXTURE) {

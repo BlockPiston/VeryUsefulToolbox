@@ -11,8 +11,8 @@ import pistonmc.vutoolbox.ModInfo;
 import pistonmc.vutoolbox.ModNetwork;
 import pistonmc.vutoolbox.ModUtils;
 import pistonmc.vutoolbox.core.Toolbox;
-import pistonmc.vutoolbox.event.MessageToolbox2Security;
-import pistonmc.vutoolbox.event.MessageToolbox2Update;
+import pistonmc.vutoolbox.event.MessageToolboxSecurity;
+import pistonmc.vutoolbox.event.MessageToolboxUpdate;
 import pistonmc.vutoolbox.event.MessageToolboxRequest;
 import pistonmc.vutoolbox.low.NBTToolbox;
 
@@ -112,7 +112,7 @@ public class TileToolbox extends TileEntity implements ISidedInventory {
 			if (sendMessage) {
 				if (!toolbox.canUse(player.getUniqueID())) {
 					// if the toolbox is not accessible because of security, send a message
-					ModNetwork.network.sendTo(new MessageToolbox2Security(toolbox.getOwner()),
+					ModNetwork.network.sendTo(new MessageToolboxSecurity(toolbox.getOwner()),
 							(EntityPlayerMP) player);
 				}
 			}
@@ -181,7 +181,7 @@ public class TileToolbox extends TileEntity implements ISidedInventory {
 			if (toolbox.processInfinitySlots()) {
 				markDirty();
 			}
-			ModNetwork.network.sendToAllAround(new MessageToolbox2Update(this),
+			ModNetwork.network.sendToAllAround(new MessageToolboxUpdate(this),
 					new TargetPoint(worldObj.provider.dimensionId, xCoord, yCoord, zCoord, 64));
 		}
 	}

@@ -17,7 +17,7 @@ import pistonmc.vutoolbox.object.TileToolbox;
  * 
  * The other slots are updated through GUI automatically
  */
-public class MessageToolbox2Update implements IMessage {
+public class MessageToolboxUpdate implements IMessage {
 	private int x;
 	private int y;
 	private int z;
@@ -25,12 +25,12 @@ public class MessageToolbox2Update implements IMessage {
 	private ItemStack[] tools;
 	private BigItemStack[] infinitySlots;
 
-	public MessageToolbox2Update() {
+	public MessageToolboxUpdate() {
 		tools = new ItemStack[Toolbox.NUM_TOP_SLOTS];
 		infinitySlots = new BigItemStack[Toolbox.NUM_INFINITY_SLOTS];
 	}
 
-	public MessageToolbox2Update(TileToolbox tile) {
+	public MessageToolboxUpdate(TileToolbox tile) {
 		this();
 		x = tile.xCoord;
 		y = tile.yCoord;
@@ -84,10 +84,10 @@ public class MessageToolbox2Update implements IMessage {
 
 	}
 
-	public static class Handler implements IMessageHandler<MessageToolbox2Update, IMessage> {
+	public static class Handler implements IMessageHandler<MessageToolboxUpdate, IMessage> {
 
 		@Override
-		public IMessage onMessage(MessageToolbox2Update message, MessageContext ctx) {
+		public IMessage onMessage(MessageToolboxUpdate message, MessageContext ctx) {
 			if (Minecraft.getMinecraft().thePlayer.dimension != message.dimension) {
 				return null;
 			}

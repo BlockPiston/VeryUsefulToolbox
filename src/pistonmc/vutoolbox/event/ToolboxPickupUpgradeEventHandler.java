@@ -13,7 +13,7 @@ import pistonmc.vutoolbox.core.Upgrades;
 import pistonmc.vutoolbox.low.NBTToolbox;
 import pistonmc.vutoolbox.object.BlockToolbox;
 
-public class Toolbox2PickupUpgradeEventHandler {
+public class ToolboxPickupUpgradeEventHandler {
 	@SubscribeEvent
 	public void on(EntityItemPickupEvent event) {
 		if (event.isCanceled()) {

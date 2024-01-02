@@ -56,7 +56,7 @@ public class MessageToolboxRequest implements IMessage {
 			if (tile == null) {
 				return null;
 			}
-			return new MessageToolbox2Update(tile);
+			return new MessageToolboxUpdate(tile);
 		}
 
 	}
