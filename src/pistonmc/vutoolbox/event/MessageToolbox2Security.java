@@ -11,14 +11,14 @@ import pistonmc.vutoolbox.ModUtils;
 /**
  * Message sent to the player trying to access someone else's toolbox
  */
-public class MessageToolBoxSecurity implements IMessage {
+public class MessageToolbox2Security implements IMessage {
 	private String ownerName;
 
-	public MessageToolBoxSecurity() {
+	public MessageToolbox2Security() {
 
 	}
 
-	public MessageToolBoxSecurity(String name) {
+	public MessageToolbox2Security(String name) {
 		ownerName = name;
 	}
 
@@ -41,10 +41,10 @@ public class MessageToolBoxSecurity implements IMessage {
 
 	}
 
-	public static class Handler implements IMessageHandler<MessageToolBoxSecurity, IMessage> {
+	public static class Handler implements IMessageHandler<MessageToolbox2Security, IMessage> {
 
 		@Override
-		public IMessage onMessage(MessageToolBoxSecurity message, MessageContext ctx) {
+		public IMessage onMessage(MessageToolbox2Security message, MessageContext ctx) {
 			ModUtils.printChatMessage(
 					StatCollector.translateToLocalFormatted("message."+ModInfo.ID+".toolbox_security", message.ownerName));
 			return null;

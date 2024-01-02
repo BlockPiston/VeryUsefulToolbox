@@ -99,15 +99,17 @@ public class ContainerToolbox extends Container {
 		
 		// player inventory
 		SlotLayouter playerLayout = new SlotLayouter();
-		playerLayout.anchorTo(11, 132, 9);
-		for (int i = 0; i < 27; i++) {
-			Slot slot = new Slot(playerInventory, playerLayout.getIndex(), playerLayout.getX(), playerLayout.getY());
-			this.addSlotToContainer(slot);
-		}
 		playerLayout.anchorTo(11, 190, 9);
 		for (int i = 0; i < 9; i++) {
 			Slot slot = new Slot(playerInventory, playerLayout.getIndex(), playerLayout.getX(), playerLayout.getY());
 			this.addSlotToContainer(slot);
+			playerLayout.next();
+		}
+		playerLayout.anchorTo(11, 132, 9);
+		for (int i = 0; i < 27; i++) {
+			Slot slot = new Slot(playerInventory, playerLayout.getIndex(), playerLayout.getX(), playerLayout.getY());
+			this.addSlotToContainer(slot);
+			playerLayout.next();
 		}
 	}
 
@@ -274,66 +276,5 @@ public class ContainerToolbox extends Container {
 
 		return itemstack;
 	}
-
-//	@Override
-//	public void addCraftingToCrafters(ICrafting craft) {
-//		super.addCraftingToCrafters(craft);
-//		craft.sendProgressBarUpdate(this, 0, machine.getInfCount(0));
-//		craft.sendProgressBarUpdate(this, 1, machine.getInfCount(1));
-//		for (int i = 0; i < 2; i++) {
-//			ItemStack is = machine.getInfStorage(i);
-//			int id = is == null ? -1 : Item.getIdFromItem(is.getItem());
-//			craft.sendProgressBarUpdate(this, 2 + i, id);
-//			if (is != null)
-//				craft.sendProgressBarUpdate(this, 4 + i, is.getItemDamage());
-//		}
-//		craft.sendProgressBarUpdate(this, 6, machine.getShortFromFourUpgrades());
-//		craft.sendProgressBarUpdate(this, 7, machine.getInfUpgrade());
-//	}
-//
-//	@Override
-//	public void updateProgressBar(int bar, int progress) {
-//		if (bar <= 1) {
-//			machine.setInfStorageCount(bar, progress);
-//		} else if (bar <= 3) {
-//			ItemStack s = progress == -1 ? null : new ItemStack(Item.getItemById(progress));
-//			machine.setInfStorage(bar - 2, s);
-//		} else if (bar <= 5) {
-//			machine.setInfStorageMetadata(bar - 4, progress);
-//		} else if (bar == 6) {
-//			machine.setFourUpgradesFromShort((short) progress);
-//		} else if (bar == 7) {
-//			machine.setInfUpgrade(progress);
-//		}
-//
-//	}
-//
-//	@Override
-//	public void detectAndSendChanges() {
-//		super.detectAndSendChanges();
-//		for (Object obj : this.crafters) {
-//			ICrafting c = (ICrafting) obj;
-//			for (int i = 0; i < 2; i++) {
-//				if (lastInfCount[i] != machine.getInfCount(i)) {
-//					c.sendProgressBarUpdate(this, i, machine.getInfCount(i));
-//				}
-//				if (lastInfMetadata[i] != machine.getInfStorageMetadata(i)) {
-//					c.sendProgressBarUpdate(this, i + 4, machine.getInfStorageMetadata(i));
-//				}
-//			}
-//			if (lastUpgrades != machine.getShortFromFourUpgrades()) {
-//				c.sendProgressBarUpdate(this, 6, machine.getShortFromFourUpgrades());
-//			}
-//			if (lastInfUpgrade != machine.getInfUpgrade()) {
-//				c.sendProgressBarUpdate(this, 7, machine.getInfUpgrade());
-//			}
-//		}
-//		for (int i = 0; i < 2; i++) {
-//			lastInfCount[i] = machine.getInfCount(i);
-//			lastInfMetadata[i] = machine.getInfStorageMetadata(i);
-//		}
-//		lastUpgrades = machine.getShortFromFourUpgrades();
-//		lastInfUpgrade = machine.getInfUpgrade();
-//	}
 
 }

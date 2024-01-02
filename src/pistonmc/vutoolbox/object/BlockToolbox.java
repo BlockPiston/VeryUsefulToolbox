@@ -26,10 +26,10 @@ import pistonmc.vutoolbox.core.Upgrades;
 import pistonmc.vutoolbox.gui.ContainerToolbox;
 import pistonmc.vutoolbox.gui.SlotToolbox;
 import pistonmc.vutoolbox.low.NBTToolbox;
+import pistonmc.vutoolbox.render.ModelToolbox;
 
 public class BlockToolbox extends BlockContainer {
 	public static final String NAME = "blockToolbox";
-	public int modelRenderID = 0;
 	public static final boolean infoOnPlaced = false;
 
 	public BlockToolbox(boolean resistance) {
@@ -47,7 +47,7 @@ public class BlockToolbox extends BlockContainer {
 	}
 	@Override
 	public int getRenderType() {
-		return modelRenderID;
+		return ModelToolbox.rendererId;
 	}
 
 	@Override
@@ -101,7 +101,7 @@ public class BlockToolbox extends BlockContainer {
 	public void breakBlock(World world, int x, int y, int z, Block block, int meta) {
 		TileToolbox tile = TileToolbox.cast(world.getTileEntity(x, y, z));
 		if (tile != null) {
-			Block blockType = tile.getToolbox().getUpgrades().isEnabled(Upgrades.RESIS) ? ModObjects.blockToolBoxResis : ModObjects.blockToolBox;
+			Block blockType = tile.getToolbox().getUpgrades().isEnabled(Upgrades.RESIS) ? ModObjects.blockToolboxResis : ModObjects.blockToolbox;
 			NBTToolbox tagToolbox = new NBTToolbox(new NBTTagCompound());
 			tile.writeToolboxToNBT(tagToolbox);
 			float dx = ModUtils.RNG.nextFloat() * 0.8F + 0.1F;

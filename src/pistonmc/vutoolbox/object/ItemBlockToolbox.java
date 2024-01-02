@@ -28,7 +28,7 @@ public class ItemBlockToolbox extends ItemBlock {
 	public void addInformation(ItemStack stack, EntityPlayer player, List tooltip, boolean extra) {
 		Block b = this.field_150939_a;
 		
-		if (b != ModObjects.blockToolBox && b != ModObjects.blockToolBoxResis) {
+		if (b != ModObjects.blockToolbox && b != ModObjects.blockToolboxResis) {
 			return;
 		}
 

@@ -11,8 +11,9 @@ import pistonmc.vutoolbox.ModInfo;
 import pistonmc.vutoolbox.ModNetwork;
 import pistonmc.vutoolbox.ModUtils;
 import pistonmc.vutoolbox.core.Toolbox;
-import pistonmc.vutoolbox.event.MessageToolBoxSecurity;
-import pistonmc.vutoolbox.event.MessageToolBoxUpdate;
+import pistonmc.vutoolbox.event.MessageToolbox2Security;
+import pistonmc.vutoolbox.event.MessageToolbox2Update;
+import pistonmc.vutoolbox.event.MessageToolboxRequest;
 import pistonmc.vutoolbox.low.NBTToolbox;
 
 public class TileToolbox extends TileEntity implements ISidedInventory {
@@ -30,6 +31,8 @@ public class TileToolbox extends TileEntity implements ISidedInventory {
 	
 	private Toolbox toolbox;
 	private boolean inventoryChanged;
+	/** track if self has requested server to update */
+	private boolean isClientInitialized;
 
 	public TileToolbox() {
 		toolbox = new Toolbox();
@@ -109,7 +112,7 @@ public class TileToolbox extends TileEntity implements ISidedInventory {
 			if (sendMessage) {
 				if (!toolbox.canUse(player.getUniqueID())) {
 					// if the toolbox is not accessible because of security, send a message
-					ModNetwork.network.sendTo(new MessageToolBoxSecurity(toolbox.getOwner()),
+					ModNetwork.network.sendTo(new MessageToolbox2Security(toolbox.getOwner()),
 							(EntityPlayerMP) player);
 				}
 			}
@@ -158,7 +161,16 @@ public class TileToolbox extends TileEntity implements ISidedInventory {
 
 	@Override
 	public void updateEntity() {
-		if (worldObj == null || !inventoryChanged) {
+		if (worldObj == null) {
+			return;
+		}
+		
+		if (worldObj.isRemote && !this.isClientInitialized) {
+			this.isClientInitialized = true;
+			ModNetwork.network.sendToServer(new MessageToolboxRequest(this));
+		}
+		
+		if (!inventoryChanged) {
 			return;
 		}
 		
@@ -169,7 +181,7 @@ public class TileToolbox extends TileEntity implements ISidedInventory {
 			if (toolbox.processInfinitySlots()) {
 				markDirty();
 			}
-			ModNetwork.network.sendToAllAround(new MessageToolBoxUpdate(this),
+			ModNetwork.network.sendToAllAround(new MessageToolbox2Update(this),
 					new TargetPoint(worldObj.provider.dimensionId, xCoord, yCoord, zCoord, 64));
 		}
 	}

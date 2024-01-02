@@ -70,7 +70,7 @@ public class BytesItemStack {
 		byte[] bytes = new byte[nbtSize];
 		buf.readBytes(bytes);
 		try {
-			return CompressedStreamTools.func_152457_a(bytes, new NBTSizeTracker(nbtSize));
+			return CompressedStreamTools.func_152457_a(bytes, new NBTSizeTracker(200000));
 		} catch (IOException e) {
 			e.printStackTrace();
 			return new NBTTagCompound();

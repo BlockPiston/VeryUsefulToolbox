@@ -12,7 +12,7 @@ public class ModCreativeTab extends CreativeTabs {
 
 	@Override
 	public Item getTabIconItem() {
-		return Item.getItemFromBlock(ModObjects.blockToolBox);
+		return Item.getItemFromBlock(ModObjects.blockToolbox);
 	}
 
 }

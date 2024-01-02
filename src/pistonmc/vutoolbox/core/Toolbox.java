@@ -283,7 +283,7 @@ public class Toolbox {
 		if (outputStack == null) {
 			outputStack = currentInfItem.copy();
 			int takeOut = Math.min(outputStack.getMaxStackSize(), infStack.getCount());
-			infStack.addCount(takeOut);
+			infStack.addCount(-takeOut);
 			outputStack.stackSize = takeOut;
 			slots[outputSlot] = outputStack;
 			return true;
@@ -301,7 +301,7 @@ public class Toolbox {
 		}
 		
 		int takeOut = Math.min(infStack.getCount(), maxStackSize - outputStack.stackSize);
-		infStack.addCount(takeOut);
+		infStack.addCount(-takeOut);
 		outputStack.stackSize += takeOut;
 		return true;
 	}

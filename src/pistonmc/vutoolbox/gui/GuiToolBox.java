@@ -82,7 +82,7 @@ public class GuiToolBox extends GuiContainer {
 
 		// tool box
 		{
-			ItemStack stack = new ItemStack(ModObjects.blockToolBox);
+			ItemStack stack = new ItemStack(ModObjects.blockToolbox);
 			GL11.glEnable(GL11.GL_DEPTH_TEST);
 			RenderHelper.enableGUIStandardItemLighting();
 			itemRender.renderItemAndEffectIntoGUI(this.fontRendererObj, this.mc.getTextureManager(), stack, TOOLBOX_SLOT_X, TOOLBOX_SLOT_Y);
@@ -160,9 +160,11 @@ public class GuiToolBox extends GuiContainer {
 			return;
 		}
 		if (isOverWorkbenchSlot(mx, my)) {
-			ArrayList<String> tooltipList = new ArrayList<>();
-			tooltipList.add(StatCollector.translateToLocal(ModInfo.ID + ".gui.toolbox.craft"));
-			drawHoveringText(tooltipList, mx - guiLeft, my - guiTop, fontRendererObj);
+			if (tile.getToolbox().getUpgrades().isEnabled(Upgrades.CRAFT)) {
+				ArrayList<String> tooltipList = new ArrayList<>();
+				tooltipList.add(StatCollector.translateToLocal(ModInfo.ID + ".gui.toolbox.craft"));
+				drawHoveringText(tooltipList, mx - guiLeft, my - guiTop, fontRendererObj);
+			}
 			return;
 		}
 		
@@ -208,9 +210,6 @@ public class GuiToolBox extends GuiContainer {
 		GL11.glColorMask(true, true, true, false);
 		
 		this.drawGradientRect(x, y, x + 16, y + 16, -2130706433, -2130706433);
-//		GL11.glColorMask(true, true, true, true);
-//		GL11.glEnable(GL11.GL_LIGHTING);
-//		GL11.glEnable(GL11.GL_DEPTH_TEST);
 		GL11.glPopAttrib();
 	}
 

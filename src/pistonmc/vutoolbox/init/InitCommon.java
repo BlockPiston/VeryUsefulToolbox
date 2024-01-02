@@ -9,7 +9,7 @@ import net.minecraftforge.common.MinecraftForge;
 import pistonmc.vutoolbox.ModGui;
 import pistonmc.vutoolbox.ModInfo;
 import pistonmc.vutoolbox.ModNetwork;
-import pistonmc.vutoolbox.event.ToolBoxPickupUpgradeEventHandler;
+import pistonmc.vutoolbox.event.Toolbox2PickupUpgradeEventHandler;
 import pistonmc.vutoolbox.object.BlockToolbox;
 import pistonmc.vutoolbox.object.ItemBlockToolbox;
 import pistonmc.vutoolbox.object.ItemChipset;
@@ -60,7 +60,7 @@ public class InitCommon implements Init {
 		// log.info("Post Init");
 
 		// log.info("Register Events");
-		MinecraftForge.EVENT_BUS.register(new ToolBoxPickupUpgradeEventHandler());
+		MinecraftForge.EVENT_BUS.register(new Toolbox2PickupUpgradeEventHandler());
 
 		// log.info("Init Network");
 		ModNetwork.registerMessages();

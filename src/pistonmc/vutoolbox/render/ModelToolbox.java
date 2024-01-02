@@ -2,6 +2,7 @@ package pistonmc.vutoolbox.render;
 
 import org.lwjgl.opengl.GL11;
 
+import cpw.mods.fml.client.registry.ClientRegistry;
 import cpw.mods.fml.client.registry.RenderingRegistry;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
@@ -20,21 +21,26 @@ import pistonmc.vutoolbox.ModInfo;
 import pistonmc.vutoolbox.ModObjects;
 import pistonmc.vutoolbox.core.Upgrades;
 import pistonmc.vutoolbox.object.TileToolbox;
-import pistonmc.vutoolbox.render.ToolBoxSpecialRenderRegistry.ToolBoxRenderType;
+import pistonmc.vutoolbox.render.ModelAbstract.ItemRenderer;
+import pistonmc.vutoolbox.render.Toolbox2SpecialRenderRegistry.ToolBoxRenderType;
 
-public class ModelToolbox2 extends ModelAbstract {
+public class ModelToolbox extends ModelAbstract {
 	public static int rendererId = 0;
-	public static void register() {
-		rendererId = RenderingRegistry.getNextAvailableRenderId();
-	}
 	private ResourceLocation textureResis;
 
-	public ModelToolbox2() {
+	public ModelToolbox() {
 		super("textures/entity/toolbox.png", 64, 64);
-		textureResis = new ResourceLocation(ModInfo.ID, "textures/entity/toolboxExploResis.png");
+		textureResis = new ResourceLocation(ModInfo.ID, "textures/entity/toolboxResis.png");
 		ModelRenderer r = newRenderer(0, 0);
 		r.addBox(1, 2, 1, 14, 14, 14);
 		r.addBox(7, 4, 15, 2, 4, 1);
+	}
+
+	public void register() {
+		rendererId = RenderingRegistry.getNextAvailableRenderId();
+		ItemRenderer r = new ItemRenderer(new TileToolbox());
+		RenderingRegistry.registerBlockHandler(r);
+		ClientRegistry.bindTileEntitySpecialRenderer(TileToolbox.class, new TileRenderer(this));
 	}
 
 	@Override
@@ -94,7 +100,7 @@ public class ModelToolbox2 extends ModelAbstract {
 	private void renderStack(ItemStack stack, int x, int y) {
 		if (stack != null) {
 			TextureManager tm = Minecraft.getMinecraft().getTextureManager();
-			ToolBoxRenderType type = ToolBoxSpecialRenderRegistry.getType(stack);
+			ToolBoxRenderType type = Toolbox2SpecialRenderRegistry.getType(stack);
 			boolean special = false;
 			float above = 0.01f;
 			if (type != ToolBoxRenderType.TEXTURE) {
@@ -143,7 +149,7 @@ public class ModelToolbox2 extends ModelAbstract {
 	public TileEntity updateTileEntityForItemRendering(TileEntity tile, Block block) {
 		TileToolbox tileToolbox = TileToolbox.cast(tile);
 		if (tileToolbox != null) {
-			tileToolbox.getToolbox().getUpgrades().set(Upgrades.RESIS, block == ModObjects.blockToolBoxResis);
+			tileToolbox.getToolbox().getUpgrades().set(Upgrades.RESIS, block == ModObjects.blockToolboxResis);
 		}
 		tile.setWorldObj(null);
 		return tile;

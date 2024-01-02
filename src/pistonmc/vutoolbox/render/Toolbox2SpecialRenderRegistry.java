@@ -5,7 +5,7 @@ import java.util.Hashtable;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
-public class ToolBoxSpecialRenderRegistry {
+public class Toolbox2SpecialRenderRegistry {
 	private static Hashtable<String, Entry> registry;
 
 	public static enum ToolBoxRenderType {

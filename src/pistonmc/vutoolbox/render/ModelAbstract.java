@@ -18,6 +18,7 @@ import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.IBlockAccess;
+import pistonmc.vutoolbox.ModInfo;
 import pistonmc.vutoolbox.object.BlockToolbox;
 import pistonmc.vutoolbox.object.TileToolbox;
 
@@ -33,7 +34,7 @@ public abstract class ModelAbstract extends ModelBase {
 	private int texHeight;
 
 	public ModelAbstract(String textureLocation, int textureWidth, int textureHeight) {
-		texture = new ResourceLocation("tntptool", textureLocation);
+		texture = new ResourceLocation(ModInfo.ID, textureLocation);
 		tesr = new TileRenderer(this);
 		texWidth = textureWidth;
 		texHeight = textureHeight;
@@ -67,15 +68,7 @@ public abstract class ModelAbstract extends ModelBase {
 		return tile;
 	}
 
-	public void bind(TileToolbox tileItem, BlockToolbox... block) {
-		ItemRenderer r = new ItemRenderer(tileItem);
-		RenderingRegistry.registerBlockHandler(r);
-		ClientRegistry.bindTileEntitySpecialRenderer(TileToolbox.class, getSpecialRenderer());
-		for (BlockToolbox b : block)
-			b.modelRenderID = r.getRenderId();
-	}
-
-	private static class TileRenderer extends TileEntitySpecialRenderer {
+	static class TileRenderer extends TileEntitySpecialRenderer {
 		private ModelAbstract model;
 
 		public TileRenderer(ModelAbstract modelAbstract) {
@@ -104,13 +97,11 @@ public abstract class ModelAbstract extends ModelBase {
 
 	}
 
-	private class ItemRenderer implements ISimpleBlockRenderingHandler {
-		private int id;
+	class ItemRenderer implements ISimpleBlockRenderingHandler {
 		private TileEntity tile;
 
 		public ItemRenderer(TileEntity t) {
 			tile = t;
-			id = RenderingRegistry.getNextAvailableRenderId();
 		}
 
 		@Override
@@ -135,7 +126,7 @@ public abstract class ModelAbstract extends ModelBase {
 
 		@Override
 		public int getRenderId() {
-			return id;
+			return ModelToolbox.rendererId;
 		}
 	}
 }

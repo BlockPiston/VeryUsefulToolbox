@@ -31,10 +31,10 @@ public class SlotToolbox extends Slot {
 		}
 		// toolboxes cannot be put in
 		Item item = stack.getItem();
-		if (item == Item.getItemFromBlock(ModObjects.blockToolBox)) {
+		if (item == Item.getItemFromBlock(ModObjects.blockToolbox)) {
 			return false;
 		}
-		if (item == Item.getItemFromBlock(ModObjects.blockToolBoxResis)) {
+		if (item == Item.getItemFromBlock(ModObjects.blockToolboxResis)) {
 			return false;
 		}
 		if (onlyAllowUnstackable) {
