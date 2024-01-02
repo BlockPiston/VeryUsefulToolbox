@@ -18,7 +18,7 @@ import pistonmc.vutoolbox.ModInfo;
  * Chipset item used in crafting, and as upgrades
  */
 public class ItemChipset extends Item {
-    private static final String NAME = "itemChipset";
+    public static final String NAME = "itemChipset";
     // @formatter:off
     private static final String[] NAMES = {
         "", 
@@ -36,6 +36,12 @@ public class ItemChipset extends Item {
         "CorePickup", 
         "UpgradePickup"
     };
+    public static final int METADATA_CRAFT_UPGRADE = 3;
+    public static final int METADATA_INFINITY_UPGRADE = 5;
+    public static final int METADATA_RESIS_UPGRADE = 7;
+    public static final int METADATA_STORAGE_UPGRADE = 9;
+    public static final int METADATA_SECURITY_UPGRADE = 11;
+    public static final int METADATA_PICKUP_UPGRADE = 13;
     // @formatter:on
     private static final IIcon[] ICONS = new IIcon[NAMES.length];
 

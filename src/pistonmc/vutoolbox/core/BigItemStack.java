@@ -43,6 +43,9 @@ public class BigItemStack {
 	
 	public void addCount(int delta) {
 		count += delta;
+		if (count == 0) {
+			stack = null;
+		}
 	}
 	
 	public void clear() {

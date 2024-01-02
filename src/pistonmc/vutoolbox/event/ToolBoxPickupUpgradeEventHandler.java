@@ -7,11 +7,11 @@ import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
-import pistonmc.vutoolbox.block.BlockToolbox;
 import pistonmc.vutoolbox.core.Toolbox;
 import pistonmc.vutoolbox.core.ToolboxStatus;
 import pistonmc.vutoolbox.core.Upgrades;
 import pistonmc.vutoolbox.low.NBTToolbox;
+import pistonmc.vutoolbox.object.BlockToolbox;
 
 public class ToolBoxPickupUpgradeEventHandler {
 	@SubscribeEvent

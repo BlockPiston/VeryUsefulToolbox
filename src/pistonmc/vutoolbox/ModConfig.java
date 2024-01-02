@@ -2,24 +2,19 @@ package pistonmc.vutoolbox;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Hashtable;
-import java.util.Map.Entry;
-
-import com.tntp.tntptool.tileentity.TileToolBox;
 
 import net.minecraftforge.common.config.ConfigCategory;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
 
 public class ModConfig {
-	public static final String CONFIG_NAME = "Recsyscletem2.cfg";
-	public static final String CONFIG_BACKUP_NAME = "Recsyscletem2.cfg.bak";
+	public static final String CONFIG_NAME = "VeryUsefulToolbox.cfg";
+	public static final String CONFIG_BACKUP_NAME = "VeryUsefulToolbox.cfg.bak";
 	private static ArrayList<Class<?>> loaders = new ArrayList<Class<?>>();
 	private boolean override = false;
 	public String version = "";
@@ -87,7 +82,7 @@ public class ModConfig {
 			try {
 				Files.copy(configP, backupP, StandardCopyOption.REPLACE_EXISTING);
 			} catch (IOException e) {
-				PistonToolbox.log.warn("Cannot back up config!");
+				//PistonToolbox.log.warn("Cannot back up config!");
 			}
 			File configFile = configP.toFile();
 			configFile.delete();
@@ -281,25 +276,25 @@ public class ModConfig {
 	}
 
 	public static void invokeLoaders(ModConfig c) {
-		for (Class<?> clazz : loaders) {
-			try {
-				Method method = clazz.getMethod("loadConfig", ModConfig.class, State.class);
-				method.setAccessible(true);
-				PistonToolbox.log.info("Loading " + clazz);
-				method.invoke(null, c, state);
-			} catch (NoSuchMethodException e) {
-				PistonToolbox.log.error("No loadConfig() in " + clazz);
-			} catch (SecurityException e) {
-				PistonToolbox.log.error("Security Error: " + clazz.getName());
-			} catch (IllegalAccessException e) {
-				PistonToolbox.log.error("Access Error: " + clazz.getName());
-			} catch (IllegalArgumentException e) {
-				PistonToolbox.log.error("Argument Error: " + clazz.getName());
-			} catch (InvocationTargetException e) {
-				PistonToolbox.log.error("Exception Error: " + clazz.getName());
-				e.printStackTrace();
-			}
-		}
+//		for (Class<?> clazz : loaders) {
+//			try {
+//				Method method = clazz.getMethod("loadConfig", ModConfig.class, State.class);
+//				method.setAccessible(true);
+//				PistonToolbox.log.info("Loading " + clazz);
+//				method.invoke(null, c, state);
+//			} catch (NoSuchMethodException e) {
+//				PistonToolbox.log.error("No loadConfig() in " + clazz);
+//			} catch (SecurityException e) {
+//				PistonToolbox.log.error("Security Error: " + clazz.getName());
+//			} catch (IllegalAccessException e) {
+//				PistonToolbox.log.error("Access Error: " + clazz.getName());
+//			} catch (IllegalArgumentException e) {
+//				PistonToolbox.log.error("Argument Error: " + clazz.getName());
+//			} catch (InvocationTargetException e) {
+//				PistonToolbox.log.error("Exception Error: " + clazz.getName());
+//				e.printStackTrace();
+//			}
+//		}
 	}
 
 	public static void loadConfigLoaders() {
@@ -312,7 +307,7 @@ public class ModConfig {
 		// addConfigLoader(TileHeatFurnace.class);
 		// addConfigLoader(TileCompressor.class);
 		// addConfigLoader(TileToolBox.class);
-		addConfigLoader(ToolBoxSpecialRenderRegistry.class);
+		//addConfigLoader(ToolBoxSpecialRenderRegistry.class);
 		// addConfigLoader(ItemMonitorCard.class);
 		// addConfigLoader(TileTrashDumpsterIndustrial.class);
 		// addConfigLoader(OtherConfig.class);

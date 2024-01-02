@@ -1,12 +1,8 @@
-package com.tntp.tntptool.model;
+package pistonmc.vutoolbox.render;
 
 import org.lwjgl.opengl.GL11;
 
-import com.tntp.tntptool.RS2Blocks;
-import com.tntp.tntptool.ToolBoxSpecialRenderRegistry;
-import com.tntp.tntptool.ToolBoxSpecialRenderRegistry.ToolBoxRenderType;
-import com.tntp.tntptool.tileentity.TileToolBox;
-
+import cpw.mods.fml.client.registry.RenderingRegistry;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.ModelRenderer;
@@ -20,13 +16,22 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.ForgeHooksClient;
+import pistonmc.vutoolbox.ModInfo;
+import pistonmc.vutoolbox.ModObjects;
+import pistonmc.vutoolbox.core.Upgrades;
+import pistonmc.vutoolbox.object.TileToolbox;
+import pistonmc.vutoolbox.render.ToolBoxSpecialRenderRegistry.ToolBoxRenderType;
 
-public class ModelToolBox extends ModelAbstract {
+public class ModelToolbox2 extends ModelAbstract {
+	public static int rendererId = 0;
+	public static void register() {
+		rendererId = RenderingRegistry.getNextAvailableRenderId();
+	}
 	private ResourceLocation textureResis;
 
-	public ModelToolBox() {
-		super("textures/entity/toolBox.png", 64, 64);
-		textureResis = new ResourceLocation("tntptool", "textures/entity/toolBoxExploResis.png");
+	public ModelToolbox2() {
+		super("textures/entity/toolbox.png", 64, 64);
+		textureResis = new ResourceLocation(ModInfo.ID, "textures/entity/toolboxExploResis.png");
 		ModelRenderer r = newRenderer(0, 0);
 		r.addBox(1, 2, 1, 14, 14, 14);
 		r.addBox(7, 4, 15, 2, 4, 1);
@@ -34,7 +39,8 @@ public class ModelToolBox extends ModelAbstract {
 
 	@Override
 	public ResourceLocation getTexture(TileEntity tile) {
-		if (((TileToolbox) tile).hasResistanceUpgrade()) {
+		TileToolbox tileToolbox = TileToolbox.cast(tile);
+		if (tileToolbox != null && tileToolbox.getToolbox().getUpgrades().isEnabled(Upgrades.RESIS)) {
 			return textureResis;
 		} else {
 			return super.getTexture(tile);
@@ -135,10 +141,9 @@ public class ModelToolBox extends ModelAbstract {
 
 	@Override
 	public TileEntity updateTileEntityForItemRendering(TileEntity tile, Block block) {
-		if (block == RS2Blocks.blockToolBox) {
-			((TileToolbox) tile).setFourUpgradesFromShort((short) 0);
-		} else {
-			((TileToolbox) tile).setFourUpgradesFromShort((short) 2);
+		TileToolbox tileToolbox = TileToolbox.cast(tile);
+		if (tileToolbox != null) {
+			tileToolbox.getToolbox().getUpgrades().set(Upgrades.RESIS, block == ModObjects.blockToolBoxResis);
 		}
 		tile.setWorldObj(null);
 		return tile;

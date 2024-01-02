@@ -1,13 +1,11 @@
 package pistonmc.vutoolbox;
 
 import cpw.mods.fml.common.network.NetworkRegistry;
-import cpw.mods.fml.common.network.simpleimpl.IMessage;
 import cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import cpw.mods.fml.relauncher.Side;
 import pistonmc.vutoolbox.event.MessageToolBoxSecurity;
 import pistonmc.vutoolbox.event.MessageToolBoxUpdate;
 import pistonmc.vutoolbox.event.MessageWorkbenchOpen;
-import pistonmc.vutoolbox.event.MessageToolBoxUpdate.Handler;
 
 public class ModNetwork {
 	public static final SimpleNetworkWrapper network = NetworkRegistry.INSTANCE.newSimpleChannel(ModInfo.ID);

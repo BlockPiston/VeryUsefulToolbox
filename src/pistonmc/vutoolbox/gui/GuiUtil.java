@@ -13,13 +13,16 @@ public class GuiUtil {
 	}
 
 	public static void drawHighlightTile(int x, int y, float z) {
+		GL11.glPushAttrib(GL11.GL_ENABLE_BIT);
+		GL11.glPushAttrib(GL11.GL_COLOR_BUFFER_BIT);
 		GL11.glDisable(GL11.GL_LIGHTING);
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
 		GL11.glColorMask(true, true, true, false);
 		drawGradientRect(x, y, x + 16, y + 16, -2130706433, -2130706433, z);
-		GL11.glColorMask(true, true, true, true);
-		GL11.glEnable(GL11.GL_LIGHTING);
-		GL11.glEnable(GL11.GL_DEPTH_TEST);
+		//GL11.glColorMask(true, true, true, true);
+		//GL11.glEnable(GL11.GL_LIGHTING);
+		//GL11.glEnable(GL11.GL_DEPTH_TEST);
+		GL11.glPopAttrib();
 	}
 
 	/**

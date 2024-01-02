@@ -4,9 +4,12 @@ import java.util.UUID;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import pistonmc.vutoolbox.ModObjects;
 import pistonmc.vutoolbox.ModUtils;
 import pistonmc.vutoolbox.low.NBTToolbox;
+import pistonmc.vutoolbox.object.ItemChipset;
 
 /**
  * The core Toolbox logic
@@ -173,85 +176,134 @@ public class Toolbox {
 		return status.getUpgrades();
 	}
 	
+	/**
+	 * Detect upgrade items in the upgrade slots
+	 */
 	public void detectUpgrades() {
-		boolean craft = false;
-		boolean storage = false;
-		boolean resis = false;
-		boolean security = false;
-		boolean pickup = false;
+		Upgrades upgrades = status.getUpgrades();
+		upgrades.clear();
 		int infinite = 0;
 
-		for (int i = 51; i < 57; i++) {
-			ItemStack is = getStackInSlot(i);
-			if (is != null) {
-				if (is.getItem() == RS2Items.itemChipset && is.getItemDamage() == 3) {
-					craft = true;
-				} else if (is.getItem() == RS2Items.itemChipset && is.getItemDamage() == 9) {
-					storage = true;
-				} else if (is.getItem() == RS2Items.itemChipset && is.getItemDamage() == 7) {
-					resis = true;
-				} else if (is.getItem() == RS2Items.itemChipset && is.getItemDamage() == 11) {
-					security = true;
-				} else if (is.getItem() == RS2Items.itemChipset && is.getItemDamage() == 13) {
-					pickup = true;
-				} else if (is.getItem() == RS2Items.itemChipset && is.getItemDamage() == 5) {
-					infinite++;
-				}
+		for (int i = UPGRADE_SLOTS_START; i < UPGRADE_SLOTS_START + NUM_UPGRADE_SLOTS; i++) {
+			ItemStack stack = getStackInSlot(i);
+			if (stack == null) {
+				continue;
 			}
+
+			Item item = stack.getItem();
+			if (item != ModObjects.itemChipset) {
+				continue;
+			}
+			int meta = stack.getItemDamage();
+			switch (meta) {
+				case ItemChipset.METADATA_CRAFT_UPGRADE:
+					upgrades.set(Upgrades.CRAFT, true);
+					break;
+				case ItemChipset.METADATA_INFINITY_UPGRADE:
+					infinite++;
+					break;
+				case ItemChipset.METADATA_RESIS_UPGRADE:
+					upgrades.set(Upgrades.RESIS, true);
+					break;
+				case ItemChipset.METADATA_STORAGE_UPGRADE:
+					upgrades.set(Upgrades.STORAGE, true);
+					break;
+				case ItemChipset.METADATA_SECURITY_UPGRADE:
+					upgrades.set(Upgrades.SECURITY, true);
+					break;
+				case ItemChipset.METADATA_PICKUP_UPGRADE:
+					upgrades.set(Upgrades.PICKUP, true);
+					break;
+				default:
+					break;
+			}
+
 		}
-		craftUpgrade = craft;
-		storageUpgrade = storage;
-		explosionUpgrade = resis;
-		securityUpgrade = security;
-		pickupUpgrade = pickup;
-		infiniteUpgrade = Math.min(3, infinite);
+		upgrades.setInfinityCount(Math.min(3, infinite));
 	}
 	
-	public void processInfinitySlots() {
-		for (int i = 0; i < infiniteStacks.length; i++) {
-			// check in
-			ItemStack in = getStackInSlot(INF_IN[i]);
-			if (in == null)
-				continue;
-			if (infiniteStacks[i] == null) {
-				infiniteStacks[i] = in.copy();
-				infiniteCount[i] = 0;
+	/**
+	 * Process infinity input and output slots
+	 */
+	public boolean processInfinitySlots() {
+		boolean changed = false;
+		for (int i = 0; i < NUM_INFINITY_SLOTS; i++) {
+			int indexIn = INFINITY_SLOTS_START + i;
+			int indexOut = indexIn + NUM_INFINITY_SLOTS;
+			if (processInfinityInput(i, indexIn)) {
+				changed = true;
 			}
-			if (in.isItemEqual(infiniteStacks[i]) && ItemStack.areItemStackTagsEqual(in, infiniteStacks[i])
-					&& infiniteCount[i] < getInfLimit()) {
-				int putIn = Math.min(in.stackSize, getInfLimit() - infiniteCount[i]);
-				infiniteCount[i] += putIn;
-				in.stackSize -= putIn;
-				if (in.stackSize == 0) {
-					in = null;
-				}
-				setInventorySlotContents(INF_IN[i], in);
-				markDirty();
+			if (processInfinityOutput(i, indexOut)) {
+				changed = true;
 			}
 		}
-		for (int i = 0; i < infiniteStacks.length; i++) {
-			// check out
-			if (infiniteStacks[i] == null || infiniteCount[i] == 0) {
-				continue;
-			}
-			ItemStack out = getStackInSlot(INF_OUT[i]);
-			if (out == null) {
-				out = infiniteStacks[i].copy();
-				out.stackSize = 0;
-			}
-			if (out.isItemEqual(infiniteStacks[i]) && ItemStack.areItemStackTagsEqual(out, infiniteStacks[i])
-					&& out.stackSize < out.getMaxStackSize()) {
-				int takeOut = Math.min(out.getMaxStackSize() - out.stackSize, infiniteCount[i]);
-				out.stackSize += takeOut;
-				infiniteCount[i] -= takeOut;
-				if (infiniteCount[i] <= 0) {
-					infiniteCount[i] = 0;
-					infiniteStacks[i] = null;
-				}
-				setInventorySlotContents(INF_OUT[i], out);
-				markDirty();
-			}
+		return changed;
+	}
+	
+	private boolean processInfinityInput(int infSlot, int inputSlot) {
+		ItemStack inputStack = slots[inputSlot];
+		if (inputStack == null) {
+			// no input to process
+			return false;
 		}
+		int infLimit = status.getUpgrades().getInfinityStackLimit();
+		BigItemStack infStack = infinitySlots[infSlot];
+		ItemStack currentInfItem = infStack.getItemStack();
+		int currentInfCount = infStack.getCount();
+		if (currentInfItem == null) {
+			// inf slot is empty, put in the stack
+			int putIn = Math.min(inputStack.stackSize, infLimit);
+			inputStack.stackSize -= putIn;
+			infStack.set(inputStack, putIn);
+		} else {
+			if (!inputStack.isItemEqual(currentInfItem)) {
+				return false;
+			}
+			if (!ItemStack.areItemStackTagsEqual(inputStack, currentInfItem)) {
+				return false;
+			}
+			int putIn = Math.min(inputStack.stackSize, infLimit - currentInfCount);
+			inputStack.stackSize -= putIn;
+			infStack.addCount(putIn);
+		}
+		if (inputStack.stackSize == 0) {
+			slots[inputSlot] = null;
+		}
+		return true;
+	}
+	
+	private boolean processInfinityOutput(int infSlot, int outputSlot) {
+		BigItemStack infStack = infinitySlots[infSlot];
+		ItemStack currentInfItem = infStack.getItemStack();
+		if (currentInfItem == null) {
+			// no item to output
+			return false;
+		}
+		ItemStack outputStack = slots[outputSlot];
+		if (outputStack == null) {
+			outputStack = currentInfItem.copy();
+			int takeOut = Math.min(outputStack.getMaxStackSize(), infStack.getCount());
+			infStack.addCount(takeOut);
+			outputStack.stackSize = takeOut;
+			slots[outputSlot] = outputStack;
+			return true;
+		}
+		
+		if (!outputStack.isItemEqual(currentInfItem)) {
+			return false;
+		}
+		if (!ItemStack.areItemStackTagsEqual(outputStack, currentInfItem)) {
+			return false;
+		}
+		int maxStackSize = outputStack.getMaxStackSize();
+		if (outputStack.stackSize >= maxStackSize) {
+			return false;
+		}
+		
+		int takeOut = Math.min(infStack.getCount(), maxStackSize - outputStack.stackSize);
+		infStack.addCount(takeOut);
+		outputStack.stackSize += takeOut;
+		return true;
 	}
 	
 	/**

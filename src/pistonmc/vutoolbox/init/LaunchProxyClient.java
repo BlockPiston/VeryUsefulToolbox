@@ -18,21 +18,14 @@ import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.registry.GameRegistry;
 import net.minecraftforge.client.ClientCommandHandler;
 
-public class LaunchProxyClient extends LaunchProxyCommon {
+public class LaunchProxyClient implements Init {
+	InitCommon common = new InitCommon();
 
 	@Override
 	public void preInit(FMLPreInitializationEvent event) {
-		GameRegistry.registerItem(new ItemChipset(), "itemChipset");
-		BlockAbstract blockToolBox = new BlockToolbox(false);
-		BlockAbstract blockToolBoxResis = new BlockToolbox(true);
-		GameRegistry.registerBlock(blockToolBox, ItemBlockTooltip.class, "blockToolBox");
-		GameRegistry.registerBlock(blockToolBoxResis, ItemBlockTooltip.class, "blockToolBoxResis");
+		common.preInit(event);
 
-		GameRegistry.registerTileEntity(TileToolbox.class, "tileToolBox");
-		PistonToolbox.log.info("Launching CLIENT");
 
-		// Recsyscletem.log.info("Loading GUI");
-		NetworkRegistry.INSTANCE.registerGuiHandler(PistonToolbox.MODID, new RecsyscletemGuiHandler());
 		// RecsyscletemGuiHandler.assignGuiID(GuiDictionary.class);
 		// RecsyscletemGuiHandler.assignGuiID(GuiRecycler.class);
 		// RecsyscletemGuiHandler.assignGuiID(GuiComposter.class);
@@ -45,7 +38,7 @@ public class LaunchProxyClient extends LaunchProxyCommon {
 		// RecsyscletemGuiHandler.assignGuiID(GuiTrashCan.class);
 		// RecsyscletemGuiHandler.assignGuiID(GuiTrashDumpster.class);
 		// RecsyscletemGuiHandler.assignGuiID(GuiHeatFurnace.class);
-		RecsyscletemGuiHandler.assignGuiID(GuiToolBox.class);
+		//ModGui.assignGuiID(GuiToolBox.class);
 		// RecsyscletemGuiHandler.assignGuiID(GuiTrashDumpsterIndustrial.class);
 		// RecsyscletemGuiHandler.assignGuiID(GuiRemoteBlockMonitor.class);
 		// RecsyscletemGuiHandler.assignGuiID(GuiAutoTrashCan.class);
@@ -57,7 +50,8 @@ public class LaunchProxyClient extends LaunchProxyCommon {
 		// blockTrashCan);
 		// new ModelTrashDumpster().bind(TileTrashDumpster.class, new
 		// TileTrashDumpster(), blockTrashDumpster);
-		new ModelToolBox().bind(TileToolbox.class, new TileToolbox(), blockToolBox, blockToolBoxResis);
+		ModelToolbox2.register();
+		new ModelToolbox().bind(new TileToolbox(), blockToolBox, blockToolBoxResis);
 		// new ModelTrashDumpsterIndustrial().bind(TileTrashDumpsterIndustrial.class,
 		// new TileTrashDumpsterIndustrial(),
 		// blockTrashDumpsterIndustrial);

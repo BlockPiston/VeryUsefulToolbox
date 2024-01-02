@@ -7,10 +7,10 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
-import pistonmc.vutoolbox.block.TileToolbox;
 import pistonmc.vutoolbox.core.BigItemStack;
 import pistonmc.vutoolbox.core.Toolbox;
 import pistonmc.vutoolbox.low.BytesItemStack;
+import pistonmc.vutoolbox.object.TileToolbox;
 
 /**
  * Message to update the displayed tools on the toolbox and the infinity slots

@@ -17,6 +17,11 @@ public class Upgrades {
 		flags = 0;
 	}
 	
+	public void clear() {
+		infinityCount = 0;
+		flags = 0;
+	}
+	
 	public void set(int upgrade, boolean enabled) {
 		if (enabled) {
 			flags |= upgrade;

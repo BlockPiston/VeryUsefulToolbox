@@ -1,12 +1,9 @@
-package com.tntp.tntptool.model;
+package pistonmc.vutoolbox.render;
 
 import java.util.ArrayList;
 
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
-
-import com.tntp.tntptool.block.BlockAbstract;
-import com.tntp.tntptool.tileentity.TileAbstract;
 
 import cpw.mods.fml.client.registry.ClientRegistry;
 import cpw.mods.fml.client.registry.ISimpleBlockRenderingHandler;
@@ -21,7 +18,13 @@ import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.IBlockAccess;
+import pistonmc.vutoolbox.object.BlockToolbox;
+import pistonmc.vutoolbox.object.TileToolbox;
 
+/**
+ * Ideally we don't need this. However when migrating from an older mod,
+ * I am too lazy to correctly get rid of this
+ */
 public abstract class ModelAbstract extends ModelBase {
 	private ArrayList<ModelRenderer> rendererList = new ArrayList<ModelRenderer>();
 	private ResourceLocation texture;
@@ -64,11 +67,11 @@ public abstract class ModelAbstract extends ModelBase {
 		return tile;
 	}
 
-	public <TILE extends TileAbstract> void bind(Class<TILE> clazz, TILE tileItem, BlockAbstract... block) {
+	public void bind(TileToolbox tileItem, BlockToolbox... block) {
 		ItemRenderer r = new ItemRenderer(tileItem);
 		RenderingRegistry.registerBlockHandler(r);
-		ClientRegistry.bindTileEntitySpecialRenderer(clazz, getSpecialRenderer());
-		for (BlockAbstract b : block)
+		ClientRegistry.bindTileEntitySpecialRenderer(TileToolbox.class, getSpecialRenderer());
+		for (BlockToolbox b : block)
 			b.modelRenderID = r.getRenderId();
 	}
 

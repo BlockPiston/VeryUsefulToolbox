@@ -5,11 +5,11 @@ import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
-import pistonmc.vutoolbox.block.TileToolbox;
 import pistonmc.vutoolbox.core.BigItemStack;
 import pistonmc.vutoolbox.core.Toolbox;
 import pistonmc.vutoolbox.core.Upgrades;
 import pistonmc.vutoolbox.low.SlotLayouter;
+import pistonmc.vutoolbox.object.TileToolbox;
 
 public class ContainerToolbox extends Container {
 	private TileToolbox tile;

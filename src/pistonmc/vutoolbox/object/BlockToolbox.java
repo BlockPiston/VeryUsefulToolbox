@@ -1,4 +1,4 @@
-package pistonmc.vutoolbox.block;
+package pistonmc.vutoolbox.object;
 
 import java.util.Random;
 
@@ -8,7 +8,6 @@ import net.minecraft.block.material.Material;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -17,17 +16,15 @@ import net.minecraft.util.MathHelper;
 import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
 import pistonmc.vutoolbox.ModCreativeTab;
+import pistonmc.vutoolbox.ModGui;
 import pistonmc.vutoolbox.ModInfo;
-import pistonmc.vutoolbox.ModNetwork;
 import pistonmc.vutoolbox.ModObjects;
 import pistonmc.vutoolbox.ModUtils;
-import pistonmc.vutoolbox.OtherConfig;
+import pistonmc.vutoolbox.core.Config;
 import pistonmc.vutoolbox.core.Toolbox;
 import pistonmc.vutoolbox.core.Upgrades;
-import pistonmc.vutoolbox.event.MessageToolBoxSecurity;
 import pistonmc.vutoolbox.gui.ContainerToolbox;
-import pistonmc.vutoolbox.gui.GuiToolBox;
-import pistonmc.vutoolbox.gui.SlotToolBoxUnstackable;
+import pistonmc.vutoolbox.gui.SlotToolbox;
 import pistonmc.vutoolbox.low.NBTToolbox;
 
 public class BlockToolbox extends BlockContainer {
@@ -91,7 +88,7 @@ public class BlockToolbox extends BlockContainer {
         if (stack.hasDisplayName()) {
         	toolbox.setCustomName(stack.getDisplayName());
         }
-		if (world.isRemote && OtherConfig.displayInfoWhenPlacingToolBox) {
+		if (world.isRemote && Config.shouldDisplayInfoWhenPlacingToolbox()) {
 			ModUtils.printChatMessage(
 					StatCollector.translateToLocalFormatted("message."+ModInfo.ID+".toolbox_place", x, y, z));
 		}
@@ -134,77 +131,110 @@ public class BlockToolbox extends BlockContainer {
 		super.breakBlock(world, x, y, z, block, meta);
 	}
 
+	/**
+	 * On right click, either take the block (sneaking), open gui, or take tools (top side)
+	 */
 	@Override
 	public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int side, float xx, float yy,
 			float zz) {
 		if (world.isRemote) {
+			// no special logic on client side
 			return true;
-		} else {
-			TileToolbox inventory = (TileToolbox) world.getTileEntity(x, y, z);
-
-			if (inventory != null) {
-				if (inventory.hasSecurityUpgrade()) {
-					if (!inventory.isOwner(player.getUniqueID())) {
-						ModNetwork.network.sendTo(new MessageToolBoxSecurity(inventory.getOwner()),
-								(EntityPlayerMP) player);
-						return true;
-					}
-				}
-				boolean special = false;
-				int specialI = -1;
-				if (side == 1) {
-					int ix = (int) (xx * 16);
-					int iz = (int) (zz * 16);
-					int temp;
-					int meta = world.getBlockMetadata(x, y, z);
-					switch (meta) {
-					case 2:
-						ix = 15 - ix;
-						iz = 15 - iz;
-						break;
-					case 4:
-						temp = ix;
-						ix = iz;
-						iz = 15 - temp;
-						break;
-					case 5:
-						temp = ix;
-						ix = 15 - iz;
-						iz = temp;
-						break;
-					}
-					if (ix >= 2 && iz >= 2 && ix < 14 && iz < 14) {
-						ix -= 2;
-						iz -= 2;
-						special = true;
-						specialI = ix / 4 + iz / 4 * 3;
-					}
-				}
-				if (special) {
-					ItemStack stackInInventory = inventory.getStackInSlot(specialI);
-					ItemStack currentHolding = player.inventory.getStackInSlot(player.inventory.currentItem);
-					if (new SlotToolBoxUnstackable(null, 0, 0, 0).isItemValid(currentHolding)) {
-						ItemStack newInInventory = currentHolding == null ? null : currentHolding.copy();
-						ItemStack newHolding = stackInInventory == null ? null : stackInInventory.copy();
-						inventory.setInventorySlotContents(specialI, newInInventory);
-						player.inventory.setInventorySlotContents(player.inventory.currentItem, newHolding);
-						player.inventory.markDirty();
-						inventory.markDirty();
-					}
-				} else {
-					if (player.isSneaking()) {
-						// take block
-						world.setBlockToAir(x, y, z);
-					} else {
-						player.openGui("tntptool", GuiToolBox.guiID, world, x, y, z);
-					}
-				}
-
+		} 
+		TileToolbox tile = TileToolbox.cast(world.getTileEntity(x, y, z));
+		if (tile == null) {
+			return true;
+		}
+		// check if the toolbox is accessible
+		if (!tile.tryAccessByPlayer(player, true)) {
+			return true;
+		}
+		
+		if (side != 1) {
+			// not clicking top
+			if (player.isSneaking()) {
+				// take block
+				world.setBlockToAir(x, y, z);
+			} else {
+				player.openGui(ModInfo.ID, ModGui.GUI_ID_TOOLBOX, world, x, y, z);
 			}
 			return true;
 		}
+		
+		// clicking top
+		int subPixelX = (int) (xx * 16);
+		int subPixelZ = (int) (zz * 16);
+		if (subPixelX < 2 || subPixelZ < 2 || subPixelX > 13 || subPixelZ > 13) {
+			// not clicking on a slot
+			return true;
+		}
+		
+		// determine slot based on rotation
+		switch (world.getBlockMetadata(x, y, z)) {
+			case 2:
+				subPixelX = 15 - subPixelX;
+				subPixelZ = 15 - subPixelZ;
+				break;
+			case 4: {
+				int temp = subPixelX;
+				subPixelX = subPixelZ;
+				subPixelZ = 15 - temp;
+				break;
+			}
+			case 5: {
+				int temp = subPixelX;
+				subPixelX = 15 - subPixelZ;
+				subPixelZ = temp;
+				break;
+			}
+		}
+		subPixelX -= 2;
+		subPixelZ -= 2;
+		int slotIndex = subPixelX / 4 + subPixelZ / 4 * 3;
+		// attempt to swap the slot and hand item
+		ItemStack stackInToolbox = tile.getStackInSlot(slotIndex);
+		ItemStack currentHolding = player.inventory.getStackInSlot(player.inventory.currentItem);
+		SlotToolbox slot = new SlotToolbox(null, 0, 0, 0);
+		slot.setOnlyAllowUnstackable();
+		if (slot.isItemValid(currentHolding)) {
+			// copy the stacks just to be safe
+			ItemStack newInToolbox = currentHolding == null ? null : currentHolding.copy();
+			ItemStack newHolding = stackInToolbox == null ? null : stackInToolbox.copy();
+			tile.setInventorySlotContents(slotIndex, newInToolbox);
+			player.inventory.setInventorySlotContents(player.inventory.currentItem, newHolding);
+			player.inventory.markDirty();
+		}
+		
+		return true;
+		
 	}
 
+	@Override
+	public void onBlockClicked(World world, int x, int y, int z, EntityPlayer player) {
+		if (world.isRemote) {
+			// no special logic on client side
+			return;
+		}
+		if (!player.isSneaking()) {
+			return;
+		}
+		
+		TileToolbox tile = TileToolbox.cast(world.getTileEntity(x, y, z));
+		if (tile == null) {
+			return;
+		}
+		
+			
+		// check if the toolbox is accessible
+		if (!tile.tryAccessByPlayer(player, true)) {
+			return;
+		}
+		// put the item in
+		ContainerToolbox container = new ContainerToolbox(tile, player.inventory);
+		container.transferStackInSlot(player, player.inventory.currentItem + 88);
+		player.inventory.markDirty();
+		tile.markDirty();
+	}
 	/**
 	 * Is this block (a) opaque and (b) a full 1m cube? This determines whether or
 	 * not to render the shared face of two adjacent blocks and also whether the
@@ -227,29 +257,6 @@ public class BlockToolbox extends BlockContainer {
 	@Override
 	public Item getItemDropped(int p_149650_1_, Random p_149650_2_, int p_149650_3_) {
 		return null;
-	}
-
-	@Override
-	public void onBlockClicked(World world, int x, int y, int z, EntityPlayer player) {
-		if (!world.isRemote) {
-			if (player.isSneaking()) {
-				TileToolbox inventory = (TileToolbox) world.getTileEntity(x, y, z);
-
-				if (inventory != null) {
-					if (inventory.hasSecurityUpgrade()) {
-						if (!inventory.isOwner(player.getUniqueID())) {
-							ModNetwork.network.sendTo(new MessageToolBoxSecurity(inventory.getOwner()),
-									(EntityPlayerMP) player);
-							return;
-						}
-					}
-					ContainerToolbox container = new ContainerToolbox(inventory, player.inventory);
-					container.transferStackInSlot(player, player.inventory.currentItem + 88);
-					player.inventory.markDirty();
-					inventory.markDirty();
-				}
-			}
-		}
 	}
 
 }
